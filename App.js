@@ -1,56 +1,89 @@
 import React, {useEffect, useState} from 'react';
-import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
-import { FlatList, StyleSheet, Text, View, ActivityIndicator } from 'react-native';
-
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-  },
-];
-
-const Item = ({title}) => (
-  <View style={styles.item}>
-    <Text style={styles.text}>{title}</Text>
-  </View>
-)
+import { FlatList, StyleSheet, Button, View, ActivityIndicator, Text, Pressable, SectionList } from 'react-native';
+import Todo from "./components/Todo";
+import CreateModal from "./components/CreateModal";
+import SectionHeader from './components/SectionHeader';
+import { Feather } from '@expo/vector-icons'; 
+import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
+import ListPlaceholder from './components/ListPlaceholder';
 
 export default function App() {
   const [isLoading, setLoading] = useState(true);
+  const [isCreating, setCreating] = useState(false);
   const [data, setData] = useState([]);
 
-  const getMovies = async () => {
-    try {
-      const response = await fetch('https://reactnative.dev/movies.json');
-      const json = await response.json();
-      setData(json.movies);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const getTodos = async () =>{
+  //   try {
+  //     const response = await fetch("http://192.168.178.152:3000/api/v1/todo_tasks");
+  //     const json = await response.json();
+
+  //     setData(json);
+  //   } catch (error) {
+  //     console.error(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
 
   const getTodos = async () =>{
     try {
       const response = await fetch("http://192.168.178.152:3000/api/v1/todo_tasks");
       const json = await response.json();
-      console.log(json);
-      setData(json);
+
+      let newData = Object.values(json.reduce((acc, item) =>{
+        if(!acc['anytime']){
+          acc['anytime'] = {
+            title: 'anytime',
+              data: []
+          }
+        }
+        if(item.isAnytime){
+          acc['anytime'].data.push(item);
+          console.log(acc['anytime'].data);
+        }
+        else if(!acc[item.deadline]) acc[item.deadline] = {
+          title: item.deadline,
+          data: []
+        }
+        if(!item.isAnytime){
+          acc[item.deadline].data.push(item);
+        }
+        return acc
+      }, {}))
+      setData(newData);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
+  }
+
+  const handleAddButtonPress = () =>{
+    setCreating(!isCreating);
+  }
+
+  const removeItem = (itemToRemoveID) =>{
+    // let remainingItems = data.filter((item) => {
+    //   return item.id !== itemToRemoveID
+    // })
+    let newData = [...data]
+    for(let i = 0; i < data.length; i++){
+      let remainingItems = data[i].data.filter((item) => {
+        return item.id !== itemToRemoveID
+      })
+      console.log(newData[i].data);
+      
+      newData[i].data = remainingItems;
+    }
+
+    for(let i = 0; i < newData.length; i++){
+      if(newData[i].data.length === 0){
+        newData.splice(i, 1)
+      }
+    }
+
+    setData(newData);
   }
 
   useEffect(() => {
@@ -59,11 +92,39 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+    {isCreating?(
+      <CreateModal isCreating={isCreating} setCreating={setCreating} getTodos={getTodos}/>
+    ) : (
+      <View></View>
+    )
+    }
     {isLoading? (
       <ActivityIndicator/>
     ):(
-      <FlatList data={data} renderItem={({item}) => <Item title={item.title}/>}/>
+      <SectionList
+        initialNumToRender={12}
+        refreshing={false}
+        onRefresh={getTodos}
+        style={styles.list}
+        stickySectionHeadersEnabled={true}
+        sections={data}
+        renderItem={({item}) => <Todo id={item.id} 
+                                      title={item.title} 
+                                      finished={item.finished}
+                                      deadline={item.deadline} 
+                                      description={item.description}
+                                      getTodos={getTodos}
+                                      removeItem={removeItem}
+                                      />}
+        ListEmptyComponent={<ListPlaceholder/>}
+        renderSectionHeader={({section}) => <SectionHeader title={section.title}/>}
+      />
     )}
+    <Pressable onPress={handleAddButtonPress}>
+        <View style={styles.addButton}>
+          <Feather name="plus" size={45} color="white" />
+        </View>
+    </Pressable>
     </View>
   );
 }
@@ -74,13 +135,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#1B1E23',
     paddingTop: Constants.statusBarHeight || 0,
   },
-  item:{
-    backgroundColor: "#262A30",
-    padding: 10,
-    marginVertical: 10,
-    marginHorizontal: 10
-  },
   text:{
     color: 'white'
+  },
+  addButton:{
+    display: 'flex',
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: "#F17300",
+    borderRadius: 10
+  },
+  addButtonText:{
+    color: 'white',
+    fontSize: 30
+  },
+  list:{
+    marginBottom: 30,
   }
 });
