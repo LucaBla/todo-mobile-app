@@ -1,8 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useState} from 'react';
 import Constants from 'expo-constants';
 import { ScrollView, StyleSheet, Button, View, ActivityIndicator, Text, TextInput, Pressable } from 'react-native';
 import DatePicker from 'react-native-date-picker'
 import { Feather } from '@expo/vector-icons'; 
+import {Context} from '../App'
 
 const handleModalBGPress = (isCreating, setCreating) => () => {
   setCreating(!isCreating);
@@ -14,9 +15,13 @@ const handleAnyTimePress = (isAnytime, setIsAnytime) => () =>{
 }
 
 const CreateModal = ({isCreating, setCreating, getTodos}) => {
+  const {
+    authToken,
+    setAuthToken
+  } = useContext(Context)
+
   const [deadline, setDeadline] = useState(new Date())
   const [open, setOpen] = useState(false)
-
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isAnytime, setIsAnytime] = useState(false);
@@ -37,6 +42,7 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
         method: "post",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": authToken
         },
         body: JSON.stringify(todoData),
       })

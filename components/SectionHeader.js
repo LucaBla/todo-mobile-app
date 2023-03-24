@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
+import { Feather } from '@expo/vector-icons'; 
 
-const SectionHeader = ({title}) => {
+const SectionHeader = ({title, expandedSections}) => {
 
   const getDate = () =>{
     if(title === "anytime"){
@@ -29,8 +30,17 @@ const SectionHeader = ({title}) => {
   }
 
   return(
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitle}>{getDate()}</Text>
+    <View style={styles.sectionHeaderWrapper}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{getDate()}</Text>
+        {expandedSections.includes(title) ? (
+          <Feather name="chevron-up" size={24} color="white" />
+        ) : (
+          <Feather name="chevron-down" size={24} color="white" />
+        )
+
+        }
+      </View>
       <View style={styles.borderBottom}/>
     </View>
   )
@@ -43,8 +53,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginVertical: 10,
   },
-  sectionHeader:{
+  sectionHeaderWrapper:{
     backgroundColor: '#1B1E23',
+  },
+  sectionHeader:{
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginRight: 20
   },
   borderBottom:{
     borderBottomColor: '#262A30',

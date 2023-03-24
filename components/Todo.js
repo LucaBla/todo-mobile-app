@@ -1,9 +1,15 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useContext, useRef, useState} from 'react';
 import {Pressable, StyleSheet, Text, View } from 'react-native';
 import { RectButton, PanGestureHandler, Swipeable } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons'; 
+import {Context} from '../App'
 
 const Todo = ({id, title, finished, deadline, description, getTodos, removeItem}) => {
+  const {
+    authToken,
+    setAuthToken
+  } = useContext(Context)
+
   const [isOpened, setIsOpened] = useState(false);
   const [swipeState, setSwipeState] = useState(null);
 
@@ -22,6 +28,7 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem}
         method: "delete",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": authToken
         }
       })
 
@@ -51,6 +58,7 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem}
         method: "put",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": authToken
         },
         body: JSON.stringify(todoData),
       })
