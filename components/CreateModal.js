@@ -64,7 +64,7 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
   return(
     <Pressable onPress={handleModalBGPress(isCreating, setCreating)} style={styles.createTodoModalBGPressable}>
           <View style={styles.createTodoModalBG}>
-            <Pressable>
+            <Pressable style={styles.modalPressable}>
               <View style={styles.createTodoModal}>
                 <View style={styles.titleWrapper}>
                   <TextInput style={styles.inputTitle} 
@@ -144,6 +144,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  modalPressable:{
+    height: "40%",
+  },
   createTodoModalBG:{
     backgroundColor: 'rgba(27, 30, 35, 0.8)',
     position: "absolute",
@@ -153,10 +156,9 @@ const styles = StyleSheet.create({
   },
   createTodoModal:{
     backgroundColor: "#383D44",
-    height: "65%",
+    height: '100%',
     width: "90%",
     alignSelf: "center",
-    marginTop: 20,
     borderRadius: 10,
   },
   titleWrapper:{
