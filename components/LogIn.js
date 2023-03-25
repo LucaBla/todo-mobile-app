@@ -1,10 +1,18 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useCallback} from 'react';
 import Constants from 'expo-constants';
 import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard} from 'react-native';
 import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function LogIn({navigation}) {
+  const [fontsLoaded] = useFonts({
+    'Exo': require('../assets/fonts/Exo-Medium.ttf'),
+  });
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -12,6 +20,16 @@ export default function LogIn({navigation}) {
     authToken,
     setAuthToken
   } = useContext(Context)
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const postLogIn = async () =>{
     const logInData = {
@@ -51,6 +69,7 @@ export default function LogIn({navigation}) {
       style={{ flex: 1 }}
       activeOpacity={1}
       onPress={Keyboard.dismiss}
+      onLayout={onLayoutRootView}
     >
       <View style={styles.container}>
         <View style={styles.logInWrapper}>
@@ -65,6 +84,7 @@ export default function LogIn({navigation}) {
               placeholderTextColor='rgba(255,255,255, 0.5)'
               onChangeText={setEmail}
               value={email}
+              inputMode={'email'}
               />
           </View>
           <View style={styles.textInputWrapper}>
@@ -110,6 +130,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 40,
     marginBottom: 40,
+    fontFamily: 'Exo',
   },
   coloredHeader: {
     color: '#F17300',

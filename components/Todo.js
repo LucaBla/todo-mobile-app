@@ -104,7 +104,7 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem}
                 paddingHorizontal: 10,
                 fontWeight: '600'
               }}>
-              Not done
+              <Feather name="x" size={24} color="white" />
             </Text>
           </View>
         ):(
@@ -116,7 +116,7 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem}
                 paddingHorizontal: 10,
                 fontWeight: '600'
               }}>
-              Done
+              <Feather name="check" size={24} color="white" />
             </Text>
           </View>
         )

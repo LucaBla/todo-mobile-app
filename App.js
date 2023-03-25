@@ -5,6 +5,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TodoList from './components/TodoList';
 import LogIn from './components/LogIn';
 import SignUp from './components/SignUp';
+import Friends from './components/Friends';
 
 const Stack = createNativeStackNavigator();
 
@@ -18,10 +19,16 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {authToken !== null ? (
-            <Stack.Screen
-              name="TodoList"
-              component={TodoList}
-            />
+            <>
+              <Stack.Screen
+                name="TodoList"
+                component={TodoList}
+              />
+              <Stack.Screen
+                name="Friends"
+                component={Friends}
+              />
+            </>
           ) : (
             <>
               <Stack.Screen

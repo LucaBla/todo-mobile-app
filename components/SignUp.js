@@ -3,8 +3,13 @@ import Constants from 'expo-constants';
 import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard} from 'react-native';
 import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
+import { useFonts } from 'expo-font';
 
 export default function SignUp({navigation}) {
+  const [fontsLoaded] = useFonts({
+    'Exo': require('../assets/fonts/Exo-Medium.ttf'),
+  });
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -152,6 +157,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 40,
     marginBottom: 40,
+    fontFamily: 'Exo',
   },
   coloredHeader: {
     color: '#F17300',

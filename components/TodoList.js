@@ -10,7 +10,7 @@ import ListPlaceholder from './ListPlaceholder';
 import { NavigationContainer } from '@react-navigation/native';
 import {Context} from '../App'
 
-export default function TodoList() {
+export default function TodoList({navigation}) {
   const {
     authToken,
     setAuthToken
@@ -76,6 +76,10 @@ export default function TodoList() {
     setAuthToken(null);
   }
 
+  const handleFriendsNavigation = () =>{
+    navigation.navigate('Friends');
+  }
+
   const handleExpand = (title) =>{
     console.log(title);
     setExpandedSections((expandedSections) => {
@@ -126,6 +130,14 @@ export default function TodoList() {
 
   return (
       <View style={styles.container}>
+      <View style={styles.topBar}>
+        <Pressable style={styles.logOutButton} onPress={handleLogOut}>
+          <Feather name="log-out" size={25} color="white" />
+        </Pressable>
+        <Pressable onPress={handleFriendsNavigation}>
+          <Feather name="users" size={24} color="white" />
+        </Pressable>
+      </View>
       {isCreating?(
         <CreateModal isCreating={isCreating} setCreating={setCreating} getTodos={getTodos}/>
       ) : (
@@ -133,7 +145,7 @@ export default function TodoList() {
       )
       }
       {isLoading? (
-        <ActivityIndicator/>
+        <ActivityIndicator size='large' color='#ffffff'/>
       ):(
         <SectionList
           ref={sectionListRef}
@@ -166,9 +178,6 @@ export default function TodoList() {
           ListEmptyComponent={<ListPlaceholder/>}
         />
       )}
-      <Pressable style={styles.logOutButton} onPress={handleLogOut}>
-        <Feather name="log-out" size={25} color="white" />
-      </Pressable>
       <Pressable onPress={handleAddButtonPress}>
           <View style={styles.addButton}>
             <Feather name="plus" size={45} color="white" />
@@ -182,7 +191,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1B1E23',
-    paddingTop: Constants.statusBarHeight + 20 || 0,
+    paddingTop: Constants.statusBarHeight + 0 || 0,
   },
   text:{
     color: 'white'
@@ -195,12 +204,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#F17300",
     borderRadius: 10
   },
+  topBar:{
+    direction: 'flex',
+    alignItems: 'center',
+    flexDirection: 'row-reverse',
+    backgroundColor: '#262A30',
+    position: 'static',
+    width: '100%',
+    height: 50,
+    paddingHorizontal: 20,
+    gap: 20,
+  },
   logOutButton:{
-    backgroundColor: '#1B1E23',
-    position: 'absolute',
-    right: 20,
-    top: Constants.statusBarHeight + 0,
-    borderRadius: 10
+    
   },
   list:{
     marginBottom: 30,
