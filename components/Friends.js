@@ -1,6 +1,6 @@
 import React, {useContext, useState, useEffect} from 'react';
 import Constants from 'expo-constants';
-import {View, ScrollView, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard, ActivityIndicator} from 'react-native';
+import {View, ScrollView, Text, Pressable, StyleSheet, TextInput, SafeAreaView, Keyboard, ActivityIndicator} from 'react-native';
 import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
 import { FlatList } from 'react-native-gesture-handler';
@@ -21,6 +21,7 @@ export default function Friends({navigation}) {
       const response = await fetch ("http://192.168.178.152:3000/api/v1/friendships", {
         method: "get",
         headers: {
+          "Content-Type": "application/json",
           "Authorization": authToken,
         }
       })
@@ -35,6 +36,31 @@ export default function Friends({navigation}) {
     }
   }
 
+  const postFriendships = async () =>{
+    const friendshipData = {
+      friendship:{
+        friend_email: email,
+      }
+    }
+
+    try{
+      const response = await fetch ("http://192.168.178.152:3000/api/v1/friendships", {
+        method: "post",
+        headers: {
+          "Authorization": authToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(friendshipData),
+      })
+      //const json = await response.json();
+
+    }catch(error){
+      console.error(error);
+    } finally{
+      setEmail('')
+    }
+  }
+
   const handleGoBack = () =>{
     navigation.goBack();
   }
@@ -44,33 +70,39 @@ export default function Friends({navigation}) {
   }, []);
 
   return (
-    <TouchableOpacity
-      style={{ flex: 1 }}
-      activeOpacity={1}
-      onPress={Keyboard.dismiss}
-    >
-      <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
         <View style={styles.topBar}>
-        <Pressable style={styles.backButton} onPress={handleGoBack}>
-          <Feather name="chevron-left" size={25} color="white" />
-        </Pressable>
+          <Pressable style={styles.backButton} onPress={handleGoBack}>
+            <Feather name="chevron-left" size={25} color="white" />
+          </Pressable>
           <Text style={styles.header}>Friends</Text>
         </View>
-        <View style={styles.addFriendSection}>
-          <Text style={styles.sectionHeader}>Add new Friend</Text>
+      <ScrollView 
+      style={styles.scrollView}
+      stickyHeaderIndices={[0, 2]}
+      >
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionHeaderText}>Add new Friend</Text>
           <View style={styles.borderBottom}/>
+        </View>
+        <View style={styles.addFriendSection}>
           <TextInput 
             placeholder='Friends E-Mail'
             placeholderTextColor={'rgba(255,255,255, 0.5)'}
             style={styles.emailInput}
+            onChangeText={setEmail}
+            value={email}
+            inputMode={'email'}
           />
-          <Pressable style={styles.addFriendButton}>
+          <Pressable style={styles.addFriendButton} onPress={postFriendships}>
             <Text style={styles.addFriendButtonText}>Add Friend</Text>
           </Pressable>
         </View>
-        <View style={styles.friendlistSection}>
-          <Text style={styles.sectionHeader}>Friendlist</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionHeaderText}>Friendlist</Text>
           <View style={styles.borderBottom}/>
+        </View>
+        <View style={styles.friendlistSection}>
             {isLoading? (
               <ActivityIndicator size='large' color='#ffffff'/>
             ) : (
@@ -78,12 +110,13 @@ export default function Friends({navigation}) {
                 style={styles.friendlist}
                 data ={friends}
                 renderItem={({item}) => <Friend email={item.email}/>}
+                scrollEnabled={false}
               />
             )
             }
         </View>
-      </View>
-    </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -91,18 +124,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1B1E23',
-    paddingTop: Constants.statusBarHeight + 0 || 0,
   },
   topBar:{
     display:'flex',
     alignItems: 'center',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#262A30',
-    width: '100%',
+    backgroundColor: '#14161A',
+    width: '95%',
     position: 'static',
     paddingHorizontal: 20,
+    alignSelf: 'center',
     height: 50,
+    borderRadius: 10,
   },
   backButton:{
     paddingRight: 10,
@@ -111,24 +145,31 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 25,
   },
+  scrollView:{
+    marginTop: 10,
+  },
   sectionHeader:{
+    backgroundColor: '#1B1E23',
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+  },
+  sectionHeaderText:{
     color: 'white',
     fontSize: 20,
-    paddingHorizontal: 20,
     marginBottom: 10,
   },
   borderBottom:{
     borderBottomColor: '#262A30',
     borderBottomWidth: 3,
-    width: '90%',
+    width: '100%',
     alignSelf: 'center',
-    marginBottom: 10,
   },
   addFriendSection:{
-    marginTop: 20,
+    marginTop: 10,
+    marginBottom: 40,
   },
   emailInput:{
-    width: '90%',
+    width: '80%',
     backgroundColor: '#383D44',
     fontSize: 20,
     marginHorizontal: 20,
@@ -136,27 +177,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     color: 'white',
     borderRadius: 10,
+    alignSelf: 'center',
   },
   addFriendButton:{
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '90%',
+    width: '80%',
     backgroundColor: '#F17300',
     marginHorizontal: 20,
     marginTop: 20,
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 10,
+    alignSelf: 'center',
   },
   addFriendButtonText:{
     fontSize: 18,
     color: 'white'
   },
   friendlistSection:{
-    marginTop: 40,
+    marginTop: 0,
+    flex: 1,
+    flexGrow: 1,
   },
   friendlist:{
- 
+    marginBottom: 80,
   },
 })

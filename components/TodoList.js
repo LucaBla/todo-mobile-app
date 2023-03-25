@@ -208,12 +208,14 @@ const styles = StyleSheet.create({
     direction: 'flex',
     alignItems: 'center',
     flexDirection: 'row-reverse',
-    backgroundColor: '#262A30',
+    backgroundColor: '#14161A',
     position: 'static',
-    width: '100%',
+    width: '95%',
     height: 50,
     paddingHorizontal: 20,
     gap: 20,
+    alignSelf: 'center',
+    borderRadius: 10,
   },
   logOutButton:{
     
