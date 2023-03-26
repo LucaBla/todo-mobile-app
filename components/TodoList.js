@@ -20,6 +20,7 @@ export default function TodoList({navigation}) {
   const [isCreating, setCreating] = useState(false);
   const [expandedSections, setExpandedSections] = useState([]);
   const [data, setData] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
 
   const sectionListRef = useRef(null);
 
@@ -58,6 +59,22 @@ export default function TodoList({navigation}) {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  const getNotificationsCount = async () =>{
+    try {
+      const response = await fetch("http://192.168.178.152:3000/api/v1/friendships/requests/count", {
+        method: "get",
+        headers: {
+          "Authorization": authToken,
+        }
+      })
+      const json = await response.json();
+
+      setNotificationCount(json);
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -128,6 +145,7 @@ export default function TodoList({navigation}) {
 
   useEffect(() => {
     getTodos();
+    getNotificationsCount();
     fillExpanedSections();
     handleScrollToItem();
   }, []);
@@ -142,6 +160,9 @@ export default function TodoList({navigation}) {
           <Feather name="users" size={24} color="white" />
         </Pressable>
         <Pressable onPress={handleNotificationsNavigation}>
+          <View style={styles.notificationCount}>
+            <Text style={styles.notificationCountText}>{notificationCount}</Text>
+          </View>
           <Feather name="mail" size={24} color="white" />
         </Pressable>
       </View>
@@ -223,6 +244,24 @@ const styles = StyleSheet.create({
     gap: 20,
     alignSelf: 'center',
     borderRadius: 10,
+  },
+  notificationCount:{
+    backgroundColor: '#F17300',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+    zIndex: 1,
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    borderRadius: 3,
+    overflow: 'visible',
+    paddingHorizontal: 3,
+  },
+  notificationCountText:{
+    color: 'white',
+    fontSize: 14,
   },
   logOutButton:{
     

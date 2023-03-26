@@ -66,12 +66,12 @@ export default function Notifications({navigation}) {
   }
 
   const removeItem = (itemToRemoveID) =>{
-    let newFriends = [...friends]
-    let remainingItems = newFriends.filter((item) => {
+    let newRequests = [...requests]
+    let remainingItems = newRequests.filter((item) => {
       return item.id !== itemToRemoveID
     })
 
-    //setFriends(remainingItems);
+    setRequests(remainingItems);
   }
 
   useEffect(() => {
@@ -86,19 +86,24 @@ export default function Notifications({navigation}) {
           </Pressable>
           <Text style={styles.header}>Notifications</Text>
         </View>
-        <View style={styles.notificationlistWrapper}>
+        <ScrollView style={styles.notificationlistWrapper}>
             {isLoading? (
               <ActivityIndicator size='large' color='#ffffff'/>
             ) : (
               <FlatList
                 style={styles.notificationList}
                 data ={requests}
-                renderItem={({item}) => <FriendshipNotification email={item.creator_email}/>}
-                //scrollEnabled={false}
+                renderItem={({item}) => <FriendshipNotification
+                                          friendshipId={item.id} 
+                                          email={item.creator_email}
+                                          removeItem={removeItem}
+                                          getFriendrequests={getFriendrequests}
+                                        />}
+                scrollEnabled={false}
               />
             )
             }
-        </View>
+        </ScrollView>
     </SafeAreaView>
   );
 }
@@ -129,9 +134,9 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   scrollView:{
-    marginTop: 10,
+    paddingTop: 10,
   },
   notificationlistWrapper:{
-    marginTop: 20,
+    paddingTop: 20,
   }
 });
