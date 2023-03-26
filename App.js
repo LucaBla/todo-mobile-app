@@ -6,6 +6,7 @@ import TodoList from './components/TodoList';
 import LogIn from './components/LogIn';
 import SignUp from './components/SignUp';
 import Friends from './components/Friends';
+import Notifications from './components/Notifications';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +28,10 @@ export default function App() {
               <Stack.Screen
                 name="Friends"
                 component={Friends}
+              />
+              <Stack.Screen
+                name="Notifications"
+                component={Notifications}
               />
             </>
           ) : (

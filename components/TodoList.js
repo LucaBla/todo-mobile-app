@@ -80,6 +80,10 @@ export default function TodoList({navigation}) {
     navigation.navigate('Friends');
   }
 
+  const handleNotificationsNavigation = () =>{
+    navigation.navigate('Notifications');
+  }
+
   const handleExpand = (title) =>{
     console.log(title);
     setExpandedSections((expandedSections) => {
@@ -132,10 +136,13 @@ export default function TodoList({navigation}) {
       <View style={styles.container}>
       <View style={styles.topBar}>
         <Pressable style={styles.logOutButton} onPress={handleLogOut}>
-          <Feather name="log-out" size={25} color="white" />
+          <Feather name="log-out" size={24} color="white" />
         </Pressable>
         <Pressable onPress={handleFriendsNavigation}>
           <Feather name="users" size={24} color="white" />
+        </Pressable>
+        <Pressable onPress={handleNotificationsNavigation}>
+          <Feather name="mail" size={24} color="white" />
         </Pressable>
       </View>
       {isCreating?(
