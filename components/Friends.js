@@ -65,6 +65,15 @@ export default function Friends({navigation}) {
     navigation.goBack();
   }
 
+  const removeItem = (itemToRemoveID) =>{
+    let newFriends = [...friends]
+    let remainingItems = newFriends.filter((item) => {
+      return item.id !== itemToRemoveID
+    })
+
+    setFriends(remainingItems);
+  }
+
   useEffect(() => {
     getFriends();
   }, []);
@@ -109,7 +118,7 @@ export default function Friends({navigation}) {
               <FlatList
                 style={styles.friendlist}
                 data ={friends}
-                renderItem={({item}) => <Friend email={item.email}/>}
+                renderItem={({item}) => <Friend friendId={item.id} email={item.email} removeItem={removeItem}/>}
                 scrollEnabled={false}
               />
             )

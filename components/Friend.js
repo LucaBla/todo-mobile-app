@@ -6,31 +6,42 @@ import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
 
-export default function Friend({email}) {
+export default function Friend({email, removeItem, friendId}) {
+  const {
+    authToken,
+    setAuthToken
+  } = useContext(Context)
 
-  // const handleDelete = async () => {
-  //   try{
-  //     removeItem(id);
-  //     const response = await fetch(`http://192.168.178.152:3000/api/v1/todo_tasks/${id}`, {
-  //       method: "delete",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //         "Authorization": authToken
-  //       }
-  //     })
+  const handleDelete = async () => {
+    const friendIdData = {
+      friendship:{
+        friend_id: friendId,
+      }
+    }
 
-  //     if (!response.ok) {
-  //       const message = `An error has occured: ${response.status} - ${response.statusText}`;
-  //       throw new Error(message);
-  //     }
+    try{
+      removeItem(friendId);
+      const response = await fetch(`http://192.168.178.152:3000/api/v1/friendships`, {
+        method: "delete",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": authToken
+        },
+        body: JSON.stringify(friendIdData)
+      })
 
-  //     const data = await response.json();
+      if (!response.ok) {
+        const message = `An error has occured: ${response.status} - ${response.statusText}`;
+        throw new Error(message);
+      }
+
+      const data = await response.json();
       
-  //   }
-  //   catch(error){
-  //     console.error(error);
-  //   }
-  // };
+    }
+    catch(error){
+      console.error(error);
+    }
+  };
 
   const renderRightActions = () => {
     return (
@@ -50,9 +61,9 @@ export default function Friend({email}) {
 
   return (
     <Swipeable overshootLeft={false}
-               overshootFriction={8}
+               overshootFriction={1}
                renderRightActions={renderRightActions} 
-               //onSwipeableOpen={handleDelete}
+               onSwipeableOpen={handleDelete}
     >
 
       <View style={styles.friendWrapper}>
