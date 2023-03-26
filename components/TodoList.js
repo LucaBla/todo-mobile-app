@@ -7,7 +7,7 @@ import SectionHeader from './SectionHeader';
 import { Feather } from '@expo/vector-icons'; 
 import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import ListPlaceholder from './ListPlaceholder';
-import { NavigationContainer } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import {Context} from '../App'
 
 export default function TodoList({navigation}) {
@@ -21,6 +21,8 @@ export default function TodoList({navigation}) {
   const [expandedSections, setExpandedSections] = useState([]);
   const [data, setData] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
+
+  const isFocused = useIsFocused();
 
   const sectionListRef = useRef(null);
 
@@ -143,6 +145,13 @@ export default function TodoList({navigation}) {
     setData(newData);
   }
 
+  useEffect(() =>{
+    if(isFocused){
+      getTodos();
+      getNotificationsCount();
+    }
+  }, [isFocused])
+
   useEffect(() => {
     getTodos();
     getNotificationsCount();
@@ -160,9 +169,14 @@ export default function TodoList({navigation}) {
           <Feather name="users" size={24} color="white" />
         </Pressable>
         <Pressable onPress={handleNotificationsNavigation}>
-          <View style={styles.notificationCount}>
-            <Text style={styles.notificationCountText}>{notificationCount}</Text>
-          </View>
+          {notificationCount !== 0 ? (
+            <View style={styles.notificationCount}>
+              <Text style={styles.notificationCountText}>{notificationCount}</Text>
+            </View>
+          ):(
+            <View></View>
+          )
+          }
           <Feather name="mail" size={24} color="white" />
         </Pressable>
       </View>
