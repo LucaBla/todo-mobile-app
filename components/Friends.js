@@ -118,7 +118,12 @@ export default function Friends({navigation}) {
               <FlatList
                 style={styles.friendlist}
                 data ={friends}
-                renderItem={({item}) => <Friend friendId={item.id} email={item.email} removeItem={removeItem}/>}
+                renderItem={({item}) => <Friend 
+                                          friendId={item.id} 
+                                          email={item.email} 
+                                          removeItem={removeItem}
+                                          addable={false}
+                                          />}
                 scrollEnabled={false}
               />
             )

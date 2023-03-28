@@ -180,12 +180,7 @@ export default function TodoList({navigation}) {
           <Feather name="mail" size={24} color="white" />
         </Pressable>
       </View>
-      {isCreating?(
-        <CreateModal isCreating={isCreating} setCreating={setCreating} getTodos={getTodos}/>
-      ) : (
-        <View></View>
-      )
-      }
+      <CreateModal isCreating={isCreating} setCreating={setCreating} getTodos={getTodos}/>
       {isLoading? (
         <ActivityIndicator size='large' color='#ffffff'/>
       ):(
