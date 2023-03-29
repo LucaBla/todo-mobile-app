@@ -60,6 +60,7 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
   
       getTodos();
       setCreating(false);
+      clearStates()
     } catch(error){
       console.error(error);
     }
@@ -85,14 +86,28 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
     }
   }
 
+  const clearStates = () =>{
+    setDeadline(new Date())
+    setOpen(false)
+    setTitle('')
+    setDescription('')
+    setIsAnytime(false)
+    setParticipantsId([])
+    setLoading(true)
+    setIsFriendsOpen(false)
+  }
+
   const handleModalBGPress = () => () => {
     console.log('test');
     setCreating(!isCreating);
   }
 
   useEffect(() => {
-    getFriends();
-  }, []);
+    if(isCreating){
+      clearStates()
+      getFriends();
+    }
+  }, [isCreating]);
 
   return(
       <Modal transparent={true} 

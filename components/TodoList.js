@@ -9,6 +9,7 @@ import { get } from 'react-native/Libraries/TurboModule/TurboModuleRegistry';
 import ListPlaceholder from './ListPlaceholder';
 import { useIsFocused } from '@react-navigation/native';
 import {Context} from '../App'
+import ParticipantsModal from './ParticipantsModal';
 
 export default function TodoList({navigation}) {
   const {
@@ -181,6 +182,7 @@ export default function TodoList({navigation}) {
         </Pressable>
       </View>
       <CreateModal isCreating={isCreating} setCreating={setCreating} getTodos={getTodos}/>
+      <ParticipantsModal/>
       {isLoading? (
         <ActivityIndicator size='large' color='#ffffff'/>
       ):(

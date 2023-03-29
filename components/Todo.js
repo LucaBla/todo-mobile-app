@@ -162,6 +162,15 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem}
             }
           </View>
           <Text style={styles.text}>{title}</Text>
+          {isOpened?(
+            <Pressable>
+              <Feather style={styles.userIcon} name="users" size={24} color="rgba(255, 255, 255, 0.5)" />
+            </Pressable>
+          ):(
+            <></>
+          )
+
+          }
         </View>
         {isOpened?(
           <View style={styles.todoInfo}>
@@ -191,6 +200,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     textAlign: "center",
     overflow: "hidden",
+  },
+  userIcon:{
+    position: "absolute",
+    right: 10,
   },
   todoState:{
     backgroundColor: "#2D3137",
