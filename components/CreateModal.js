@@ -27,7 +27,7 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
   const [participantsId, setParticipantsId] = useState([]);
   const [friends, setFriends] = useState('');
   const [isLoading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState(isCreating);
+  const [isFriendsOpen, setIsFriendsOpen] = useState(false);
 
   const postTodo = async () =>{
     const todoData = {
@@ -100,7 +100,7 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
              backdropColor={'rgba(27, 30, 35, 0.8)'} 
              onBackdropPress={()=>setCreating(!isCreating)}
       >
-        <View style={styles.centeredView}>
+        
           <View style={styles.createTodoModal}>
             <View style={styles.titleWrapper}>
               <TextInput style={styles.inputTitle} 
@@ -119,12 +119,19 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
               />
             </ScrollView>
             <View style={styles.friendlistWrapper}>
-              <Pressable>
-                <Text>Add Friends</Text>
+              <Pressable style={styles.friendlistHeader} onPress={() => setIsFriendsOpen(!isFriendsOpen)}>
+                <Text style={styles.addFriendText}>Add Friends</Text>
+                {isFriendsOpen ?(
+                  <Feather name="chevron-up" size={24} color="rgba(255, 255, 255, 0.5)" />
+                ):(
+                  <Feather name="chevron-down" size={24} color="rgba(255, 255, 255, 0.5)" />
+                )
+
+                }
               </Pressable>
               {isLoading ? (
                 <></>
-              ) : (
+              ) : (isFriendsOpen ?(
                 <FlatList style={styles.friendlist}
                           data ={friends}
                           renderItem={({item}) => <Friend 
@@ -137,6 +144,10 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
                                   }
                           scrollEnabled={true}
                 /> 
+
+              ):(
+                <></>
+              )
                     )
                     }
             </View>
@@ -163,7 +174,6 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
                               color="#F17300"
                               disabled={isAnytime}
                               onPress={() => setOpen(true)}>
-                        <Text>Test</Text>
                       </Button>
                       <DatePicker modal
                                   mode='date'
@@ -186,42 +196,20 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
                     </Pressable>
               </View>
           </View>
-        </View>
+        
       </Modal>
   )
 }
 
 const styles = StyleSheet.create({
-  modal:{
-    height: '100%',
-    zIndex: 10000,
-    width: '100%',
-    marginTop: Constants.statusBarHeight || 0,
-    backgroundColor: 'green',
-    margin: 20
-  },
-  centeredView:{
-    //flex: 1,
-    //paddingTop: Constants.statusBarHeight + 10 || 0,
-    //alignItems: 'center',
-    //height: '100%',
-    //width: '100%',
-    backgroundColor: 'green',
-  },
-  createTodoModalBG:{
-    position: "absolute",
-    alignSelf: "center",
-    width: "100%",
-    height: "100%",
-    zIndex: 10,
-    marginTop: Constants.statusBarHeight || 0,
-  },
   createTodoModal:{
     backgroundColor: "#383D44",
-    height: '60%',
-    width: "90%",
+    width: "100%",
     alignSelf: "center",
     borderRadius: 10,
+    position: "absolute",
+    top: 0,
+    marginTop: Constants.statusBarHeight + 0 || 0,
   },
   titleWrapper:{
     backgroundColor:"#262A30",
@@ -242,6 +230,11 @@ const styles = StyleSheet.create({
   },
   descriptionWrapper:{
     padding: 0,
+    height: 140,
+  },
+  addFriendText:{
+    color: "rgba(255, 255, 255, 0.5)",
+    fontSize: 18
   },
   selectDateWrapper:{
   },
@@ -288,10 +281,23 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   friendlistWrapper:{
-    height: 125,
+    backgroundColor:"#262A30",
+    paddingHorizontal: 10,
+  },
+  friendlistHeader:{
+    backgroundColor:"#262A30",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: "space-between",
+    marginLeft: -10
   },
   friendlist:{
-  
+    backgroundColor:"#383D44",
+    borderRadius: 10,
+    height: 180,
   }
 });
 
