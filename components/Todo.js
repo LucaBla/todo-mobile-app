@@ -4,7 +4,8 @@ import { RectButton, PanGestureHandler, Swipeable } from 'react-native-gesture-h
 import { Feather } from '@expo/vector-icons'; 
 import {Context} from '../App'
 
-const Todo = ({id, title, finished, deadline, description, getTodos, removeItem}) => {
+const Todo = ({id, title, finished, deadline, description, getTodos, removeItem, isShowingParticipants,
+  setIsShowingParticipants, setParticipantsTodoID}) => {
   const {
     authToken,
     setAuthToken
@@ -92,6 +93,12 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem}
     setIsOpened(!isOpened);
   };
 
+  const handleParticipantsPress = () =>{
+    setParticipantsTodoID(id)
+    setIsShowingParticipants(!isShowingParticipants)
+
+  }
+
   const renderLeftActions = () => {
     return (
       <View style={styles.swipeLeftActionWrapper}>
@@ -163,8 +170,11 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem}
           </View>
           <Text style={styles.text}>{title}</Text>
           {isOpened?(
-            <Pressable>
-              <Feather style={styles.userIcon} name="users" size={24} color="rgba(255, 255, 255, 0.5)" />
+            <Pressable 
+              style={styles.userIcon} 
+              onPress={handleParticipantsPress}
+            >
+              <Feather name="users" size={24} color="rgba(255, 255, 255, 0.5)" />
             </Pressable>
           ):(
             <></>
@@ -203,7 +213,7 @@ const styles = StyleSheet.create({
   },
   userIcon:{
     position: "absolute",
-    right: 10,
+    right:10,
   },
   todoState:{
     backgroundColor: "#2D3137",

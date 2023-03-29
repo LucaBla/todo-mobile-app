@@ -19,10 +19,11 @@ export default function TodoList({navigation}) {
 
   const [isLoading, setLoading] = useState(true);
   const [isCreating, setCreating] = useState(false);
+  const [isShowingParticipants, setIsShowingParticipants] = useState(false);
+  const [participantsTodoID, setParticipantsTodoID] = useState(null);
   const [expandedSections, setExpandedSections] = useState([]);
   const [data, setData] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
-
   const isFocused = useIsFocused();
 
   const sectionListRef = useRef(null);
@@ -182,7 +183,11 @@ export default function TodoList({navigation}) {
         </Pressable>
       </View>
       <CreateModal isCreating={isCreating} setCreating={setCreating} getTodos={getTodos}/>
-      <ParticipantsModal/>
+      <ParticipantsModal
+        isShowingParticipants={isShowingParticipants} 
+        setIsShowingParticipants={setIsShowingParticipants}
+        participantsTodoID={participantsTodoID}
+        />
       {isLoading? (
         <ActivityIndicator size='large' color='#ffffff'/>
       ):(
@@ -207,6 +212,9 @@ export default function TodoList({navigation}) {
                                           description={item.description}
                                           getTodos={getTodos}
                                           removeItem={removeItem}
+                                          isShowingParticipants={isShowingParticipants} 
+                                          setIsShowingParticipants={setIsShowingParticipants}
+                                          setParticipantsTodoID={setParticipantsTodoID}
                                           />}
           } 
           renderSectionHeader={({section}) => 

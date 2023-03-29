@@ -8,36 +8,116 @@ import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
 import Modal from 'react-native-modal';
 
-const ParticipantsModal = ({}) => {
+const ParticipantsModal = ({isShowingParticipants, setIsShowingParticipants, participantsTodoID}) => {
+  const {
+    authToken,
+    setAuthToken
+  } = useContext(Context)
 
-  // useEffect(() => {
-  //   if(isCreating){
-  //     clearStates()
-  //     getFriends();
-  //   }
-  // }, [isCreating]);
+  const [isLoading, setLoading] = useState(true);
+  const [participants, setParticipants] = useState([]);
+  const [creator, setCreator] = useState(null);
+
+  const getCreator = async () =>{
+    try{
+      const response = 
+        await fetch (`http://192.168.178.152:3000/api/v1/todo_tasks/${participantsTodoID}/creator`, {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": authToken,
+          }
+        })
+      const json = await response.json();
+      console.log(json);
+
+      setCreator(json)
+    } catch (error) {
+      console.error(error);
+    } finally{
+      setLoading(false);
+    }
+  }
+
+  const getParticipants = async () =>{
+    try{
+      const response = 
+        await fetch (`http://192.168.178.152:3000/api/v1/todo_tasks/${participantsTodoID}/participants`, {
+          method: "get",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": authToken,
+          }
+        })
+      const json = await response.json();
+      console.log(json);
+
+      setParticipants(json)
+    } catch (error) {
+      console.error(error);
+    } finally{
+      getCreator();
+    }
+  }
+
+  const combineParticipantsCreator = () =>{
+    console.log(participants)
+    let newParticipants = [...participants]
+    newParticipants.push(creator)
+    newParticipants = newParticipants.reverse()
+    console.log('test')
+    console.log(newParticipants);
+    setParticipants(newParticipants);
+  }
+
+  const clearStates = () =>{
+    setLoading(true)
+    setParticipants([])
+    setCreator(null)
+  }
+
+  useEffect(() => {
+    if(isShowingParticipants){
+      getParticipants();
+    }
+  }, [isShowingParticipants]);
+
+  useEffect(() => {
+    if(!participants.includes(creator)){
+      combineParticipantsCreator();
+    }
+  }, [creator]);
 
   return(
       <Modal transparent={true} 
-             //isVisible={isCreating} 
-             isVisible={true} 
+             isVisible={isShowingParticipants} 
              backdropColor={'rgba(27, 30, 35, 0.8)'} 
-             //onBackdropPress={()=>setCreating(!isCreating)}
+             onBackdropPress={()=>setIsShowingParticipants(!isShowingParticipants)}
       >
         <View style={styles.modal}>
           <View style={styles.headerWrapper}>
             <Text style={styles.headerText}>Participants</Text>
           </View>
-          <View style={styles.participantsWrapper}>
-            <FlatList
-              style={styles.participantsList}
-              //data ={participants}
-              renderItem={({item}) => <View>
-                <Text>{item.email}</Text>
-              </View>}
-              scrollEnabled={true}
-            />
-          </View>
+          {isLoading ? (
+            <ActivityIndicator size='large' color='#ffffff'/>
+          ):(
+            <View style={styles.participantsWrapper}>
+              <FlatList
+                style={styles.participantsList}
+                data ={participants}
+                renderItem={({item, index}) => <View style={styles.participant}>
+                  <Text style={styles.text}>
+                  {item.email}
+                  <Text style={styles.creatorText}>
+                    {index === 0 ? ' (Creator)' : ''}
+                  </Text>
+                  </Text>
+                </View>}
+                scrollEnabled={true}
+              />
+            </View>
+          )
+          }
         </View>
       </Modal>
   )
@@ -65,10 +145,18 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   participantsWrapper:{
-
+    margin: 15,
+    marginVertical: 10
+  },
+  participant:{
+    marginVertical: 5,
   },
   text:{
     color: 'white',
+    fontSize: 16
+  },
+  creatorText:{
+    color: '#F17300',
   }
 });
 
