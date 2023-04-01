@@ -7,6 +7,7 @@ import LogIn from './components/LogIn';
 import SignUp from './components/SignUp';
 import Friends from './components/Friends';
 import Notifications from './components/Notifications';
+import ForgotPassword from './components/ForgotPassword';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,6 +44,10 @@ export default function App() {
               <Stack.Screen
                 name="SignUp"
                 component={SignUp}
+              />
+              <Stack.Screen
+                name="ForgotPassword"
+                component={ForgotPassword}
               />
             </>
           )

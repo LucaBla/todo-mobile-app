@@ -1,55 +1,29 @@
-import React, {useContext, useState, useCallback} from 'react';
+import React, {useContext, useState} from 'react';
 import Constants from 'expo-constants';
 import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard} from 'react-native';
 import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
 
-SplashScreen.preventAutoHideAsync();
-
-export default function LogIn({navigation}) {
+export default function ForgotPassword({navigation}) {
   const [fontsLoaded] = useFonts({
     'Exo': require('../assets/fonts/Exo-Medium.ttf'),
   });
-
+  
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const {
-    authToken,
-    setAuthToken
-  } = useContext(Context)
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
-
-  const handleForgotPasswordNavigation =  () => {
-    navigation.navigate('ForgotPassword');
-  }
-
-  const postLogIn = async () =>{
-    const logInData = {
-      todo_user:{
-        email: email,
-        password: password,
-      }
+  const postResetPassword = async () =>{
+    const resetData = {
+      email: email
     }
 
     try{
-      const response = await fetch("http://192.168.178.152:3000/todo_users/sign_in", {
+      const response = await fetch("http://192.168.178.152:3000/todo_users/password", {
         method: "post",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(logInData),
+        body: JSON.stringify(resetData),
       })
 
       if (!response.ok) {
@@ -57,14 +31,10 @@ export default function LogIn({navigation}) {
         throw new Error(message);
       }
 
-      const data = await response;
-      const authToken = data.headers.get('Authorization');
-
-      console.log(authToken);
-
-      setAuthToken(authToken);
     } catch(error){
       console.error(error);
+    }finally{
+      setEmail('');
     }
   }
 
@@ -73,7 +43,6 @@ export default function LogIn({navigation}) {
       style={{ flex: 1 }}
       activeOpacity={1}
       onPress={Keyboard.dismiss}
-      onLayout={onLayoutRootView}
     >
       <View style={styles.container}>
         <View style={styles.logInWrapper}>
@@ -88,29 +57,20 @@ export default function LogIn({navigation}) {
               placeholderTextColor='rgba(255,255,255, 0.5)'
               onChangeText={setEmail}
               value={email}
-              inputMode={'email'}
               />
           </View>
-          <View style={styles.textInputWrapper}>
-            <Feather name="lock" size={20} color="rgba(255,255,255, 0.5)" />
-            <TextInput 
-              style={styles.textInput} 
-              secureTextEntry={true}
-              placeholder='Password' 
-              placeholderTextColor='rgba(255,255,255, 0.5)'
-              onChangeText={setPassword}
-              value={password} />
-          </View>
-          <Pressable style={styles.logInButton} onPress={postLogIn}>
-            <Text style={styles.logInButtonText}>Login</Text>
-          </Pressable>
-          <Pressable onPress={handleForgotPasswordNavigation}>
-            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          <Pressable style={styles.submitButton} onPress={postResetPassword}>
+            <Text style={styles.logInButtonText}>Submit</Text>
           </Pressable>
         </View>
-        <Pressable style={styles.signUpButton} onPress={() => navigation.navigate('SignUp')}>
-          <Text style={styles.logInButtonText}>Signup</Text>
-        </Pressable>
+        <View style={styles.buttonsWrapper}>
+          <Pressable style={styles.signUpButton} onPress={() => navigation.navigate('LogIn')}>
+            <Text style={styles.logInButtonText}>Login</Text>
+          </Pressable>
+          <Pressable style={styles.signUpButton} onPress={() => navigation.navigate('SignUp')}>
+            <Text style={styles.logInButtonText}>SignUp</Text>
+          </Pressable>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -155,7 +115,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 20,
   },
-  logInButton:{
+  submitButton:{
     backgroundColor: '#F17300',
     width: '80%',
     display: 'flex',
@@ -174,6 +134,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 20,
   },
+  buttonsWrapper:{
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    marginBottom: 40
+  },
   signUpButton:{
     backgroundColor: '#262A30',
     width: '90%',
@@ -182,7 +149,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 5,
     padding: 10,
-    marginTop: 10,
-    marginBottom: 40
+    marginTop: 20,
   },
 })
