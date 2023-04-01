@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import Constants from 'expo-constants';
 import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard} from 'react-native';
 import {Context} from '../App'
@@ -11,15 +11,106 @@ export default function SignUp({navigation}) {
   });
   
   const [email, setEmail] = useState('');
+  const [isValidEmail, setIsValidEmail] = useState(false);
   const [password, setPassword] = useState('');
+  const [isValidPassword, setIsValidPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isValidConfirmPassword, setIsValidConfirmPassword] = useState(false);
+  const [passwordIs8Characters, setPasswordIs8Characters] = useState(false);
+  const [passwordContainsNumber, setPasswordContainsNumber] = useState(false);
+  const [passwordContainsLowercase, setPasswordContainsLowercase] = useState(false);
+  const [passwordContainsUppercase, setPasswordContainsUppercase] = useState(false);
+  const [passwordContainsSpecialChar, setPasswordContainsSpecialChar] = useState(false);
+  const [isPostable, setIsPostable] = useState(false);
+
+  const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/; 
 
   const {
     authToken,
     setAuthToken
   } = useContext(Context)
 
+  const validatePassword = () =>{
+    if(regex.test(password)){
+      console.log('valid')
+      setIsValidPassword(true);
+    }
+    else{
+      console.log('invalid')
+      setIsValidPassword(false);
+    }
+  }
+
+  const updatePasswordValidationMessage = () =>{
+
+    if(password.length >= 8){
+      setPasswordIs8Characters(true);
+    }
+    else{
+      setPasswordIs8Characters(false);
+    }
+
+    if(/[0-9]/.test(password)){
+      setPasswordContainsNumber(true)
+    }
+    else{
+      setPasswordContainsNumber(false)
+    }
+
+    if(/[a-z]/.test(password)){
+      setPasswordContainsLowercase(true)
+    }
+    else{
+      setPasswordContainsLowercase(false)
+    }
+
+    if(/[A-Z]/.test(password)){
+      setPasswordContainsUppercase(true)
+    }
+    else{
+      setPasswordContainsUppercase(false)
+    }
+
+    if(/[^a-zA-Z0-9]/.test(password)){
+      setPasswordContainsSpecialChar(true)
+    }
+    else{
+      setPasswordContainsSpecialChar(false)
+    }
+  }
+
+  const validateEmail = () =>{
+    if(/^\S+@\S+\.\S+$/.test(email)){
+      setIsValidEmail(true);
+    }
+    else{
+      setIsValidEmail(false);
+    }
+  }
+
+  const validateConfirmPassword = () =>{
+    if(password === confirmPassword){
+      setIsValidConfirmPassword(true);
+    }
+    else{
+      setIsValidConfirmPassword(false);
+    }
+  }
+
+  const validatePostable = () =>{
+    if(isValidEmail && isValidPassword && isValidConfirmPassword){
+      setIsPostable(true);
+    }
+    else{
+      setIsPostable(false);
+    }
+  }
+
   const postUser = async () =>{
+    if(!isValidPassword){
+      console.error("Passwords invalid!");
+      return
+    }
     if(password !== confirmPassword){
       console.error("Passwords do not match");
       return
@@ -86,6 +177,25 @@ export default function SignUp({navigation}) {
     }
   }
 
+  useEffect(() =>{
+    validatePassword();
+    updatePasswordValidationMessage();
+
+    validateConfirmPassword(confirmPassword);
+  }, [password])
+
+  useEffect(() =>{
+    validateEmail();
+  }, [email])
+
+  useEffect(() =>{
+    validateConfirmPassword(confirmPassword);
+  }, [confirmPassword])
+
+  useEffect(() =>{
+    validatePostable();
+  }, [isValidEmail, isValidPassword, isValidConfirmPassword])
+
   return (
     <TouchableOpacity
       style={{ flex: 1 }}
@@ -97,7 +207,7 @@ export default function SignUp({navigation}) {
           <Text style={styles.header}>
             Daily<Text style={styles.coloredHeader}>Drill</Text>
           </Text>
-          <View style={styles.textInputWrapper}>
+          <View style={[styles.textInputWrapper, !isValidEmail? styles.redBorder : styles.invisibleBorder]}>
             <Feather name="mail" size={20} color="rgba(255,255,255, 0.5)" />
             <TextInput 
               style={styles.textInput} 
@@ -105,6 +215,7 @@ export default function SignUp({navigation}) {
               placeholderTextColor='rgba(255,255,255, 0.5)'
               onChangeText={setEmail}
               value={email}
+              inputMode='email'
               />
           </View>
           <View style={styles.textInputWrapper}>
@@ -115,9 +226,62 @@ export default function SignUp({navigation}) {
               placeholder='Password' 
               placeholderTextColor='rgba(255,255,255, 0.5)'
               onChangeText={setPassword}
+              onEndEditing={event => {
+                console.log('test');
+                if(event.nativeEvent.text.length === 0) {
+                  setPassword('');
+                }
+              }}
               value={password} />
           </View>
-          <View style={styles.textInputWrapper}>
+          <View style={styles.passwordInfoWrapper}>
+            <View style={styles.flexRow}>
+              {passwordIs8Characters ? (
+                <Feather name="check" size={18} color="#81A4CD" />
+              ): (
+                <Feather name="x" size={18} color="red" />
+              )
+              }
+              <Text style={styles.passwordInfoText}>Atleast 8 characters</Text>
+            </View>
+            <View style={styles.flexRow}>
+              {passwordContainsNumber ? (
+                <Feather name="check" size={18} color="#81A4CD" />
+              ): (
+                <Feather name="x" size={18} color="red" />
+              )
+              }
+              <Text style={styles.passwordInfoText}>Atleast 1 number</Text>
+            </View>
+            <View style={styles.flexRow}>
+              {passwordContainsLowercase ? (
+                <Feather name="check" size={18} color="#81A4CD" />
+              ): (
+                <Feather name="x" size={18} color="red" />
+              )
+              }
+              <Text style={styles.passwordInfoText}>Atleast 1 lowercase letter</Text>
+            </View>
+            <View style={styles.flexRow}>
+              {passwordContainsUppercase ? (
+                <Feather name="check" size={18} color="#81A4CD" />
+              ): (
+                <Feather name="x" size={18} color="red" />
+              )
+              }
+              <Text style={styles.passwordInfoText}>Atleast 1 capital letter</Text>
+            </View>
+            <View style={styles.flexRow}>
+              {passwordContainsSpecialChar ? (
+                <Feather name="check" size={18} color="#81A4CD" />
+              ): (
+                <Feather name="x" size={18} color="red" />
+              )
+              }
+              <Text style={styles.passwordInfoText}>Atleast 1 special character</Text>
+            </View>
+          </View>
+          <View style={[styles.textInputWrapper, styles.marginBottomTen]}>
             <Feather name="lock" size={20} color="rgba(255,255,255, 0.5)" />
             <TextInput 
               style={styles.textInput} 
@@ -127,11 +291,37 @@ export default function SignUp({navigation}) {
               onChangeText={setConfirmPassword}
               value={confirmPassword} />
           </View>
-          <Pressable style={styles.logInButton} onPress={postUser}>
-            <Text style={styles.logInButtonText}>Signup</Text>
+          <View style={[styles.passwordInfoWrapper, styles.marginTopZero]}>
+          {isValidConfirmPassword ? (
+                <View style={styles.flexRow}>
+                  <Feather name="check" size={18} color="#81A4CD" />
+                  <Text style={styles.passwordInfoText}>Passwords match</Text>
+                  </View>
+              ): (
+                <View style={styles.flexRow}>
+                  <Feather name="x" size={18} color="red" />
+                  <Text style={styles.passwordInfoText}>Passwords need to match</Text>
+                </View>
+              )
+          }
+          </View>
+          <Pressable 
+            style={[styles.logInButton, !isPostable ? styles.disabledButton : styles.logInButton]} 
+            onPress={postUser} 
+            disabled={!isPostable}
+          >
+            <Text 
+              style={[styles.logInButtonText,
+                     !isPostable ? styles.disabledButtonText : styles.logInButtonText]}
+            >
+              Signup
+            </Text>
           </Pressable>
         </View>
-        <Pressable style={styles.signUpButton} onPress={() => navigation.navigate('LogIn')}>
+        <Pressable 
+          style={styles.signUpButton} 
+          onPress={() => navigation.navigate('LogIn')}
+        >
           <Text style={styles.logInButtonText}>Login</Text>
         </Pressable>
       </View>
@@ -178,6 +368,16 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: 20,
   },
+  passwordInfoWrapper:{
+    alignSelf: 'flex-start',
+    marginLeft: '10%',
+    marginBottom: 10,
+    marginTop: -10
+  },
+  passwordInfoText:{
+    color: 'rgba(255,255,255, 0.5)',
+    fontSize: 14
+  },
   logInButton:{
     backgroundColor: '#F17300',
     width: '80%',
@@ -207,5 +407,35 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 10,
     marginBottom: 40
+  },
+  marginBottomTen:{
+    marginBottom: 10,
+  },
+  marginTopZero:{
+    marginTop: 0,
+  },
+  disabledButton:{
+    backgroundColor: '#383D44',
+  },
+  disabledButtonText:{
+    color: 'rgba(255,255,255, 0.2)',
+  },
+  valid:{
+    color: 'green',
+  },
+  invalid:{
+    color: 'red',
+  },
+  flexRow:{
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  redBorder:{
+    borderColor: 'red',
+    borderWidth: 2,
+  },
+  invisibleBorder:{
+    borderWidth: 2,
+    borderColor: '#1B1E23',
   },
 })
