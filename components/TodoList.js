@@ -41,22 +41,43 @@ export default function TodoList({navigation}) {
       })
       const json = await response.json();
 
+      
+      let today= new Date();
+      let yesterday= new Date();
+
+      yesterday.setDate(today.getDate() - 1)
+
       let newData = Object.values(json.reduce((acc, item) =>{
-        if(!acc['anytime']){
-          acc['anytime'] = {
-            title: 'anytime',
-              data: []
-          }
-        }
+        let date = new Date(item.deadline)
+
         if(item.isAnytime){
+          if(!acc['anytime']){
+            acc['anytime'] = {
+              title: 'anytime',
+                data: []
+            }
+          }
+
           acc['anytime'].data.push(item);
           console.log(acc['anytime'].data);
         }
-        else if(!acc[item.deadline]) acc[item.deadline] = {
-          title: item.deadline,
-          data: []
+        else if(date <= yesterday){
+          console.log("Hello There.");
+          if(!acc['overdue']){
+            acc['overdue'] = {
+              title: 'overdue',
+                data: []
+            }
+          }
+
+          acc['overdue'].data.push(item);
         }
-        if(!item.isAnytime){
+        else if(!item.isAnytime){
+          if(!acc[item.deadline]) acc[item.deadline] = {
+            title: item.deadline,
+            data: []
+          }
+
           acc[item.deadline].data.push(item);
         }
         return acc

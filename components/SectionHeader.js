@@ -4,8 +4,12 @@ import { Feather } from '@expo/vector-icons';
 const SectionHeader = ({title, expandedSections}) => {
 
   const getDate = () =>{
+    console.log('title: ' + title);
     if(title === "anytime"){
       return "anytime"
+    }
+    if(title === "overdue"){
+      return "overdue"
     }
 
     let date = new Date(title)
@@ -14,13 +18,13 @@ const SectionHeader = ({title, expandedSections}) => {
     let yesterday = new Date()
 
     if(today.getHours() >= 22){
-      date.setDate(today.getDate() + 1)
+      date.setDate(today.getDate())
     }
 
     tomorrow.setDate(today.getDate() + 1)
     yesterday.setDate(today.getDate() - 1)
 
-    if(date.toDateString() === today.toDateString()){
+   if(date.toDateString() === today.toDateString()){
       return "today"
     }
     else if(date.toDateString() === tomorrow.toDateString()){
@@ -35,7 +39,13 @@ const SectionHeader = ({title, expandedSections}) => {
   return(
     <View style={styles.sectionHeaderWrapper}>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{getDate()}</Text>
+        <Text 
+        style={[styles.sectionTitle,
+                title === 'overdue' ? styles.redText : styles.none,
+                title === 'anytime' ? styles.blueText : styles.none]}
+        >
+          {getDate()}
+        </Text>
         {expandedSections.includes(title) ? (
           <Feather name="chevron-up" size={24} color="white" />
         ) : (
@@ -72,6 +82,14 @@ const styles = StyleSheet.create({
     width: '90%',
     alignSelf: 'center',
     marginBottom: 10,
+  }, redText:{
+    color: 'red',
+  },
+  blueText:{
+    color: '#81A4CD',
+  },
+  none:{
+
   }
 })
 
