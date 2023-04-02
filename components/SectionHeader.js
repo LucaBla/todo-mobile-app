@@ -7,15 +7,18 @@ const SectionHeader = ({title, expandedSections}) => {
     if(title === "anytime"){
       return "anytime"
     }
-    let date = new Date(Date.parse(title))
+
+    let date = new Date(title)
     let today = new Date()
     let tomorrow = new Date()
     let yesterday = new Date()
 
+    if(today.getHours() >= 22){
+      date.setDate(today.getDate() + 1)
+    }
+
     tomorrow.setDate(today.getDate() + 1)
     yesterday.setDate(today.getDate() - 1)
-
-    console.log(date.getDate())
 
     if(date.toDateString() === today.toDateString()){
       return "today"

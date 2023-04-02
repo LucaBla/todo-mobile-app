@@ -30,6 +30,7 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
   const [isFriendsOpen, setIsFriendsOpen] = useState(false);
 
   const postTodo = async () =>{
+    console.log("new Date: "+new Date());
     const todoData = {
       todo_task:{
         title: title,

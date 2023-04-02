@@ -10,6 +10,8 @@ import ListPlaceholder from './ListPlaceholder';
 import { useIsFocused } from '@react-navigation/native';
 import {Context} from '../App'
 import ParticipantsModal from './ParticipantsModal';
+import * as SplashScreen from 'expo-splash-screen';
+import * as SecureStore from 'expo-secure-store';
 
 export default function TodoList({navigation}) {
   const {
@@ -93,8 +95,28 @@ export default function TodoList({navigation}) {
     setCreating(!isCreating);
   }
 
-  const handleLogOut = () =>{
+  const handleLogOut = async () =>{
     setAuthToken(null);
+    try {
+      const response = await fetch("http://192.168.178.152:3000/todo_users/sign_out", {
+        method: "delete",
+        headers: {
+          "Authorization": authToken,
+        }
+      })
+
+      deleteToken();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async function deleteToken() {
+    try {
+      await SecureStore.deleteItemAsync('authToken');
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   const handleFriendsNavigation = () =>{
@@ -159,6 +181,7 @@ export default function TodoList({navigation}) {
     getNotificationsCount();
     fillExpanedSections();
     handleScrollToItem();
+    SplashScreen.hideAsync();
   }, []);
 
   return (

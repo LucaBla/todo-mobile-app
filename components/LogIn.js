@@ -1,12 +1,11 @@
-import React, {useContext, useState, useCallback} from 'react';
+import React, {useContext, useState, useCallback, useEffect} from 'react';
 import Constants from 'expo-constants';
 import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard} from 'react-native';
 import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-
-SplashScreen.preventAutoHideAsync();
+import * as SecureStore from 'expo-secure-store';
 
 export default function LogIn({navigation}) {
   const [fontsLoaded] = useFonts({
@@ -20,16 +19,6 @@ export default function LogIn({navigation}) {
     authToken,
     setAuthToken
   } = useContext(Context)
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   const handleForgotPasswordNavigation =  () => {
     navigation.navigate('ForgotPassword');
@@ -58,14 +47,37 @@ export default function LogIn({navigation}) {
       }
 
       const data = await response;
-      const authToken = data.headers.get('Authorization');
+      const newAuthToken = data.headers.get('Authorization');
 
-      console.log(authToken);
+      console.log(newAuthToken);
 
-      setAuthToken(authToken);
+      saveAuthToken(newAuthToken);
+      setAuthToken(newAuthToken);
     } catch(error){
       console.error(error);
     }
+  }
+
+  const saveAuthToken = async (newAuthToken) =>{
+    try {
+      await SecureStore.setItemAsync('authToken', newAuthToken);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // useEffect(() => {
+  //   saveAuthToken();
+  // }, [authToken]);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
   }
 
   return (
