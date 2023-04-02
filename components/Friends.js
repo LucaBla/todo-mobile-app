@@ -5,6 +5,7 @@ import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
 import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
+import Toast from 'react-native-root-toast';
 
 export default function Friends({navigation}) {
   const [isLoading, setLoading] = useState(true);
@@ -52,7 +53,11 @@ export default function Friends({navigation}) {
         },
         body: JSON.stringify(friendshipData),
       })
-      //const json = await response.json();
+      
+      let toast = Toast.show('Send friend request if user exists.', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.TOP  + 80
+      });
 
     }catch(error){
       console.error(error);

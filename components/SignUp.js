@@ -4,6 +4,7 @@ import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard
 import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
+import * as SecureStore from 'expo-secure-store';
 
 export default function SignUp({navigation}) {
   const [fontsLoaded] = useFonts({
@@ -167,13 +168,22 @@ export default function SignUp({navigation}) {
       }
 
       const data = await response;
-      const authToken = data.headers.get('Authorization');
+      const newAuthToken = data.headers.get('Authorization');
 
-      console.log(authToken);
+      console.log(newAuthToken);
 
-      setAuthToken(authToken);
+      saveAuthToken(newAuthToken);
+      setAuthToken(newAuthToken);
     } catch(error){
       console.error(error);
+    }
+  }
+
+  const saveAuthToken = async (newAuthToken) =>{
+    try {
+      await SecureStore.setItemAsync('authToken', newAuthToken);
+    } catch (error) {
+      console.log(error);
     }
   }
 

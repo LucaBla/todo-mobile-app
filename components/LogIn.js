@@ -6,6 +6,7 @@ import { Feather } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SecureStore from 'expo-secure-store';
+import Toast from 'react-native-root-toast';
 
 export default function LogIn({navigation}) {
   const [fontsLoaded] = useFonts({
@@ -53,8 +54,17 @@ export default function LogIn({navigation}) {
 
       saveAuthToken(newAuthToken);
       setAuthToken(newAuthToken);
+
+      let toast = Toast.show('Logged In.', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.TOP  + 80
+      });
     } catch(error){
       console.error(error);
+      let toast = Toast.show('Login Failed.', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.TOP  + 80
+      });
     }
   }
 

@@ -12,6 +12,7 @@ import {Context} from '../App'
 import ParticipantsModal from './ParticipantsModal';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SecureStore from 'expo-secure-store';
+import Toast from 'react-native-root-toast';
 
 export default function TodoList({navigation}) {
   const {
@@ -104,6 +105,11 @@ export default function TodoList({navigation}) {
           "Authorization": authToken,
         }
       })
+
+      let toast = Toast.show('Logged Out.', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.TOP  + 80
+      });
 
       deleteToken();
     } catch (error) {

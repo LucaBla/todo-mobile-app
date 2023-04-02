@@ -7,6 +7,7 @@ import {Context} from '../App'
 import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
 import Modal from 'react-native-modal';
+import Toast from 'react-native-root-toast';
 
 const handleAnyTimePress = (isAnytime, setIsAnytime) => () =>{
   console.log("T3est");
@@ -57,13 +58,20 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
         throw new Error(message);
       }
 
-      const data = await response.json();
+      let toast = Toast.show('Todo created.', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.TOP  + 80
+      });
   
       getTodos();
       setCreating(false);
       clearStates()
     } catch(error){
       console.error(error);
+      let toast = Toast.show('Todo creation failed.', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.TOP  + 80
+      });
     }
   }
 

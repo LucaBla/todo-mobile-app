@@ -10,6 +10,7 @@ import Notifications from './components/Notifications';
 import ForgotPassword from './components/ForgotPassword';
 import * as SecureStore from 'expo-secure-store';
 import * as SplashScreen from 'expo-splash-screen';
+import { RootSiblingParent } from 'react-native-root-siblings';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -78,45 +79,47 @@ export default function App() {
   }, [authToken]);
 
   return (
-    <Context.Provider value={{authToken, setAuthToken}}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {isValidAuthToken ? (
-            <>
-              <Stack.Screen
-                name="TodoList"
-                component={TodoList}
-              />
-              <Stack.Screen
-                name="Friends"
-                component={Friends}
-              />
-              <Stack.Screen
-                name="Notifications"
-                component={Notifications}
-              />
-            </>
-          ) : (
-            <>
-              <Stack.Screen
-                name="LogIn"
-                component={LogIn}
-              />
-              <Stack.Screen
-                name="SignUp"
-                component={SignUp}
-              />
-              <Stack.Screen
-                name="ForgotPassword"
-                component={ForgotPassword}
-              />
-            </>
-          )
+    <RootSiblingParent> 
+      <Context.Provider value={{authToken, setAuthToken}}>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {isValidAuthToken ? (
+              <>
+                <Stack.Screen
+                  name="TodoList"
+                  component={TodoList}
+                />
+                <Stack.Screen
+                  name="Friends"
+                  component={Friends}
+                />
+                <Stack.Screen
+                  name="Notifications"
+                  component={Notifications}
+                />
+              </>
+            ) : (
+              <>
+                <Stack.Screen
+                  name="LogIn"
+                  component={LogIn}
+                />
+                <Stack.Screen
+                  name="SignUp"
+                  component={SignUp}
+                />
+                <Stack.Screen
+                  name="ForgotPassword"
+                  component={ForgotPassword}
+                />
+              </>
+            )
 
-          }
-        </Stack.Navigator>
-      </NavigationContainer>
-    </Context.Provider>
+            }
+          </Stack.Navigator>
+        </NavigationContainer>
+      </Context.Provider>
+    </RootSiblingParent> 
   );
 }
 
