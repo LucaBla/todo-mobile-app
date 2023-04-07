@@ -1,7 +1,6 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import Constants from 'expo-constants';
 import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard} from 'react-native';
-import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
 import Toast from 'react-native-root-toast';

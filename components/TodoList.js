@@ -13,6 +13,7 @@ import ParticipantsModal from './ParticipantsModal';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SecureStore from 'expo-secure-store';
 import Toast from 'react-native-root-toast';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 export default function TodoList({navigation}) {
   const {
@@ -212,7 +213,7 @@ export default function TodoList({navigation}) {
   }, []);
 
   return (
-      <View style={styles.container}>
+      <GestureHandlerRootView style={styles.container}>
       <View style={styles.topBar}>
         <Pressable style={styles.logOutButton} onPress={handleLogOut}>
           <Feather name="log-out" size={24} color="white" />
@@ -280,7 +281,7 @@ export default function TodoList({navigation}) {
             <Feather name="plus" size={45} color="white" />
           </View>
       </Pressable>
-      </View>
+      </GestureHandlerRootView>
   );
 }
 
@@ -302,7 +303,7 @@ const styles = StyleSheet.create({
     borderRadius: 10
   },
   topBar:{
-    direction: 'flex',
+    display: 'flex',
     alignItems: 'center',
     flexDirection: 'row-reverse',
     backgroundColor: '#14161A',

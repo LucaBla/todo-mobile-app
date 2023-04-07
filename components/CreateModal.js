@@ -8,6 +8,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-root-toast';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const handleAnyTimePress = (isAnytime, setIsAnytime) => () =>{
   console.log("T3est");
@@ -125,7 +126,7 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
              onBackdropPress={()=>setCreating(!isCreating)}
       >
         
-          <View style={styles.createTodoModal}>
+          <GestureHandlerRootView style={styles.createTodoModal}>
             <View style={styles.titleWrapper}>
               <TextInput style={styles.inputTitle} 
                          placeholder='New Todo...' placeholderTextColor="rgba(255, 255, 255, 0.5)"
@@ -219,7 +220,7 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
                       </View>
                     </Pressable>
               </View>
-          </View>
+          </GestureHandlerRootView>
         
       </Modal>
   )

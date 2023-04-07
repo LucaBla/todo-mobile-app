@@ -6,6 +6,7 @@ import { Feather } from '@expo/vector-icons';
 import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
 import FriendshipNotification from './FriendshipNotification';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 export default function Notifications({navigation}) {
   const [isLoading, setLoading] = useState(true);
@@ -80,6 +81,7 @@ export default function Notifications({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <GestureHandlerRootView>
         <View style={styles.topBar}>
           <Pressable style={styles.backButton} onPress={handleGoBack}>
             <Feather name="chevron-left" size={25} color="white" />
@@ -104,6 +106,7 @@ export default function Notifications({navigation}) {
             )
             }
         </ScrollView>
+        </GestureHandlerRootView>
     </SafeAreaView>
   );
 }
@@ -119,7 +122,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
   },
   topBar:{
-    direction: 'flex',
+    display: 'flex',
     alignItems: 'center',
     flexDirection: 'row',
     backgroundColor: '#14161A',

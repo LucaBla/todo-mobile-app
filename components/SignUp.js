@@ -1,10 +1,11 @@
 import React, {useContext, useState, useEffect} from 'react';
 import Constants from 'expo-constants';
-import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard} from 'react-native';
+import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard, Dimensions} from 'react-native';
 import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
 import * as SecureStore from 'expo-secure-store';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function SignUp({navigation}) {
   const [fontsLoaded] = useFonts({
@@ -23,6 +24,7 @@ export default function SignUp({navigation}) {
   const [passwordContainsUppercase, setPasswordContainsUppercase] = useState(false);
   const [passwordContainsSpecialChar, setPasswordContainsSpecialChar] = useState(false);
   const [isPostable, setIsPostable] = useState(false);
+  const [isScrollable, setIsScrollable] = useState(false);
 
   const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/; 
 
@@ -187,6 +189,18 @@ export default function SignUp({navigation}) {
     }
   }
 
+  const onContentSizeChange = (contentWidth, contentHeight) => {
+    console.log("Moin");
+    console.log(contentHeight);
+    console.log(Constants.statusBarHeight);
+    console.log(Dimensions.get('window').height);
+    if (contentHeight > Dimensions.get('window').height) {
+      setIsScrollable(true);
+    } else {
+      setIsScrollable(false);
+    }
+  };
+
   useEffect(() =>{
     validatePassword();
     updatePasswordValidationMessage();
@@ -207,12 +221,18 @@ export default function SignUp({navigation}) {
   }, [isValidEmail, isValidPassword, isValidConfirmPassword])
 
   return (
-    <TouchableOpacity
-      style={{ flex: 1 }}
-      activeOpacity={1}
-      onPress={Keyboard.dismiss}
-    >
+    // <TouchableOpacity
+    //   style={{ flex: 1 }}
+    //   activeOpacity={1}
+    //   onPress={Keyboard.dismiss}
+    // >
       <View style={styles.container}>
+        <ScrollView 
+          style={styles.scrollView}
+          scrollEnabled={isScrollable}
+          onContentSizeChange={onContentSizeChange}
+        >
+        <View style={styles.scrollContent}>
         <View style={styles.logInWrapper}>
           <Text style={styles.header}>
             Daily<Text style={styles.coloredHeader}>Drill</Text>
@@ -335,7 +355,9 @@ export default function SignUp({navigation}) {
           <Text style={styles.logInButtonText}>Login</Text>
         </Pressable>
       </View>
-    </TouchableOpacity>
+      </ScrollView>
+      </View>
+    // </TouchableOpacity>
   );
 }
 
@@ -346,6 +368,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#1B1E23',
     paddingTop: Constants.statusBarHeight + 20 || 0,
+  },
+  scrollView:{
+    height: '100%',
+    width: '100%',
+  },
+  scrollContent:{
+    height: '100%',
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logInWrapper:{
     display: 'flex',
@@ -409,7 +442,7 @@ const styles = StyleSheet.create({
   },
   signUpButton:{
     backgroundColor: '#262A30',
-    width: '90%',
+    width: '88%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

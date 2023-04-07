@@ -6,6 +6,7 @@ import { Feather } from '@expo/vector-icons';
 import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
 import Toast from 'react-native-root-toast';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 export default function Friends({navigation}) {
   const [isLoading, setLoading] = useState(true);
@@ -85,56 +86,58 @@ export default function Friends({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-        <View style={styles.topBar}>
-          <Pressable style={styles.backButton} onPress={handleGoBack}>
-            <Feather name="chevron-left" size={25} color="white" />
-          </Pressable>
-          <Text style={styles.header}>Friends</Text>
-        </View>
-      <ScrollView 
-      style={styles.scrollView}
-      stickyHeaderIndices={[0, 2]}
-      >
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionHeaderText}>Add new Friend</Text>
-          <View style={styles.borderBottom}/>
-        </View>
-        <View style={styles.addFriendSection}>
-          <TextInput 
-            placeholder='Friends E-Mail'
-            placeholderTextColor={'rgba(255,255,255, 0.5)'}
-            style={styles.emailInput}
-            onChangeText={setEmail}
-            value={email}
-            inputMode={'email'}
-          />
-          <Pressable style={styles.addFriendButton} onPress={postFriendships}>
-            <Text style={styles.addFriendButtonText}>Add Friend</Text>
-          </Pressable>
-        </View>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionHeaderText}>Friendlist</Text>
-          <View style={styles.borderBottom}/>
-        </View>
-        <View style={styles.friendlistSection}>
-            {isLoading? (
-              <ActivityIndicator size='large' color='#ffffff'/>
-            ) : (
-              <FlatList
-                style={styles.friendlist}
-                data ={friends}
-                renderItem={({item}) => <Friend 
-                                          friendId={item.id} 
-                                          email={item.email} 
-                                          removeItem={removeItem}
-                                          addable={false}
-                                          />}
-                scrollEnabled={false}
-              />
-            )
-            }
-        </View>
-      </ScrollView>
+      <GestureHandlerRootView>
+          <View style={styles.topBar}>
+            <Pressable style={styles.backButton} onPress={handleGoBack}>
+              <Feather name="chevron-left" size={25} color="white" />
+            </Pressable>
+            <Text style={styles.header}>Friends</Text>
+          </View>
+        <ScrollView 
+        style={styles.scrollView}
+        stickyHeaderIndices={[0, 2]}
+        >
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionHeaderText}>Add new Friend</Text>
+            <View style={styles.borderBottom}/>
+          </View>
+          <View style={styles.addFriendSection}>
+            <TextInput 
+              placeholder='Friends E-Mail'
+              placeholderTextColor={'rgba(255,255,255, 0.5)'}
+              style={styles.emailInput}
+              onChangeText={setEmail}
+              value={email}
+              inputMode={'email'}
+            />
+            <Pressable style={styles.addFriendButton} onPress={postFriendships}>
+              <Text style={styles.addFriendButtonText}>Add Friend</Text>
+            </Pressable>
+          </View>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionHeaderText}>Friendlist</Text>
+            <View style={styles.borderBottom}/>
+          </View>
+          <View style={styles.friendlistSection}>
+              {isLoading? (
+                <ActivityIndicator size='large' color='#ffffff'/>
+              ) : (
+                <FlatList
+                  style={styles.friendlist}
+                  data ={friends}
+                  renderItem={({item}) => <Friend 
+                                            friendId={item.id} 
+                                            email={item.email} 
+                                            removeItem={removeItem}
+                                            addable={false}
+                                            />}
+                  scrollEnabled={false}
+                />
+              )
+              }
+          </View>
+        </ScrollView>
+      </GestureHandlerRootView>
     </SafeAreaView>
   );
 }
@@ -143,6 +146,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1B1E23',
+    paddingTop: Constants.statusBarHeight + 0 || 0,
   },
   topBar:{
     display:'flex',
