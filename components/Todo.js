@@ -3,9 +3,10 @@ import {Pressable, StyleSheet, Text, View } from 'react-native';
 import { RectButton, PanGestureHandler, Swipeable } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons'; 
 import {Context} from '../App'
+import { handleUpdateTodo, handleDeleteTodo, getTodos } from '../api';
 
 const Todo = ({id, title, finished, deadline, description, getTodos, removeItem, isShowingParticipants,
-  setIsShowingParticipants, setParticipantsTodoID}) => {
+  setIsShowingParticipants, setParticipantsTodoID, setData, setLoading}) => {
   const {
     authToken,
     setAuthToken
@@ -22,68 +23,12 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem,
     }
   };
 
-  const handleDelete = async () => {
-    try{
-      removeItem(id);
-      const response = await fetch(`http://192.168.178.152:3000/api/v1/todo_tasks/${id}`, {
-        method: "delete",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken
-        }
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-      const data = await response.json();
-      
-    }
-    catch(error){
-      console.error(error);
-    }
-  };
-  
-  const handleUpdate = async () => {
-
-    const todoData = {
-      todo_task:{
-        finished: !finished,
-      }
-    }
-
-    try{
-      const response = await fetch(`http://192.168.178.152:3000/api/v1/todo_tasks/${id}`, {
-        method: "put",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken
-        },
-        body: JSON.stringify(todoData),
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-      const data = await response.json();
-  
-      getTodos();
-    }
-    catch(error){
-      console.error(error);
-    }
-  }
-
   function handleSwipe(direction){
     if(direction === "right"){
-      handleDelete();
+      handleDeleteTodo(removeItem, id, authToken);
     }
     else if(direction === "left"){
-      handleUpdate();
+      handleUpdateTodo(finished, id, authToken, setData, setLoading);
       closeSwipeable();
     }
   }

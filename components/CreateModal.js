@@ -9,6 +9,7 @@ import Friend from './Friend';
 import Modal from 'react-native-modal';
 import Toast from 'react-native-root-toast';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import { postTodo, getFriends } from '../api';
 
 const handleAnyTimePress = (isAnytime, setIsAnytime) => () =>{
   console.log("T3est");
@@ -31,71 +32,6 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
   const [isLoading, setLoading] = useState(true);
   const [isFriendsOpen, setIsFriendsOpen] = useState(false);
 
-  const postTodo = async () =>{
-    console.log("new Date: "+new Date());
-    const todoData = {
-      todo_task:{
-        title: title,
-        deadline: deadline,
-        description: description,
-        finished: false,
-        isAnytime: isAnytime,
-        participants_id: participantsId
-      }
-    }
-
-    try{
-      const response = await fetch("http://192.168.178.152:3000/api/v1/todo_tasks", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken
-        },
-        body: JSON.stringify(todoData),
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-      let toast = Toast.show('Todo created.', {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.TOP  + 80
-      });
-  
-      getTodos();
-      setCreating(false);
-      clearStates()
-    } catch(error){
-      console.error(error);
-      let toast = Toast.show('Todo creation failed.', {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.TOP  + 80
-      });
-    }
-  }
-
-  const getFriends = async () =>{
-    try{
-      const response = await fetch ("http://192.168.178.152:3000/api/v1/friendships", {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken,
-        }
-      })
-      const json = await response.json();
-      console.log(json);
-
-      setFriends(json)
-    } catch (error) {
-      console.error(error);
-    } finally{
-      setLoading(false);
-    }
-  }
-
   const clearStates = () =>{
     setDeadline(new Date())
     setOpen(false)
@@ -115,7 +51,7 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
   useEffect(() => {
     if(isCreating){
       clearStates()
-      getFriends();
+      getFriends(authToken, setFriends, setLoading);
     }
   }, [isCreating]);
 
@@ -214,7 +150,14 @@ const CreateModal = ({isCreating, setCreating, getTodos}) => {
                                   }}
                       />
                     </View>
-                    <Pressable style={styles.saveButton} onPress={postTodo}>
+                    <Pressable style={styles.saveButton} onPress={()=>postTodo(title,
+                                                                               deadline,
+                                                                               description,
+                                                                               isAnytime,
+                                                                               participantsId, 
+                                                                               authToken, 
+                                                                               setCreating)}
+                    >
                       <View>
                         <Feather name="save" size={24} color='rgba(255, 255, 255, 0.5)' />
                       </View>

@@ -6,8 +6,9 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { Feather } from '@expo/vector-icons'; 
 import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
+import { handleDeleteFriendshipNotification, handleAcceptFriendshipNotification } from '../api';
 
-export default function FriendshipNotification({navigation, email, friendshipId, removeItem, getFriendrequests}) {
+export default function FriendshipNotification({navigation, email, friendshipId, removeItem}) {
 
   const {
     authToken,
@@ -22,68 +23,12 @@ export default function FriendshipNotification({navigation, email, friendshipId,
     }
   };
 
-  const handleDelete = async () => {
-    try{
-      removeItem(friendshipId);
-      const response = await fetch(`http://192.168.178.152:3000/api/v1/friendships/${friendshipId}`, {
-        method: "delete",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken
-        }
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-      const data = await response.json();
-      
-    }
-    catch(error){
-      console.error(error);
-    }
-  };
-  
-  const handleAccept = async () => {
-
-    const acceptData = {
-      friendship:{
-        accepted: true,
-      }
-    }
-
-    try{
-      removeItem(friendshipId);
-      const response = await fetch(`http://192.168.178.152:3000/api/v1/friendships/${friendshipId}`, {
-        method: "put",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken
-        },
-        body: JSON.stringify(acceptData),
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-      const data = await response.json();
-  
-    }
-    catch(error){
-      console.error(error);
-    }
-  }
-
   function handleSwipe(direction){
     if(direction === "right"){
-      handleDelete();
+      handleDeleteFriendshipNotification(removeItem, friendshipId, authToken);
     }
     else if(direction === "left"){
-      handleAccept();
+      handleAcceptFriendshipNotification(removeItem, friendshipId, authToken);
     }
   }
 

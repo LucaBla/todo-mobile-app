@@ -7,6 +7,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
 import FriendshipNotification from './FriendshipNotification';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import { getFriendrequests } from '../api';
 
 export default function Notifications({navigation}) {
   const [isLoading, setLoading] = useState(true);
@@ -16,51 +17,6 @@ export default function Notifications({navigation}) {
     authToken,
     setAuthToken
   } = useContext(Context)
-
-  const getFriendrequests = async () =>{
-    try{
-      const response = await fetch ("http://192.168.178.152:3000/api/v1/friendships/requests", {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken,
-        }
-      })
-      const json = await response.json();
-      console.log(json);
-
-      setRequests(json)
-    } catch (error) {
-      console.error(error);
-    } finally{
-      setLoading(false);
-    }
-  }
-
-  // const postFriendships = async () =>{
-  //   const friendshipData = {
-  //     friendship:{
-  //       friend_email: email,
-  //     }
-  //   }
-
-  //   try{
-  //     const response = await fetch ("http://192.168.178.152:3000/api/v1/friendships", {
-  //       method: "post",
-  //       headers: {
-  //         "Authorization": authToken,
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(friendshipData),
-  //     })
-  //     //const json = await response.json();
-
-  //   }catch(error){
-  //     console.error(error);
-  //   } finally{
-  //     setEmail('')
-  //   }
-  // }
 
   const handleGoBack = () =>{
     navigation.goBack();
@@ -76,7 +32,7 @@ export default function Notifications({navigation}) {
   }
 
   useEffect(() => {
-    getFriendrequests();
+    getFriendrequests(authToken, setRequests, setLoading);
   }, []);
 
   return (
@@ -99,7 +55,6 @@ export default function Notifications({navigation}) {
                                           friendshipId={item.id} 
                                           email={item.creator_email}
                                           removeItem={removeItem}
-                                          getFriendrequests={getFriendrequests}
                                         />}
                 scrollEnabled={false}
               />

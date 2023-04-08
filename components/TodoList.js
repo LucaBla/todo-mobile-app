@@ -14,6 +14,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as SecureStore from 'expo-secure-store';
 import Toast from 'react-native-root-toast';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import { getTodos, getNotificationsCount, handleLogOut } from '../api';
 
 export default function TodoList({navigation}) {
   const {
@@ -32,81 +33,6 @@ export default function TodoList({navigation}) {
 
   const sectionListRef = useRef(null);
 
-  const getTodos = async () =>{
-    try {
-      const response = await fetch("http://192.168.178.152:3000/api/v1/todo_tasks", {
-        method: "get",
-        headers: {
-          "Authorization": authToken,
-        }
-      })
-      const json = await response.json();
-
-      
-      let today= new Date();
-      let yesterday= new Date();
-
-      yesterday.setDate(today.getDate() - 1)
-
-      let newData = Object.values(json.reduce((acc, item) =>{
-        let date = new Date(item.deadline)
-
-        if(item.isAnytime){
-          if(!acc['anytime']){
-            acc['anytime'] = {
-              title: 'anytime',
-                data: []
-            }
-          }
-
-          acc['anytime'].data.push(item);
-          console.log(acc['anytime'].data);
-        }
-        else if(date <= yesterday){
-          console.log("Hello There.");
-          if(!acc['overdue']){
-            acc['overdue'] = {
-              title: 'overdue',
-                data: []
-            }
-          }
-
-          acc['overdue'].data.push(item);
-        }
-        else if(!item.isAnytime){
-          if(!acc[item.deadline]) acc[item.deadline] = {
-            title: item.deadline,
-            data: []
-          }
-
-          acc[item.deadline].data.push(item);
-        }
-        return acc
-      }, {}))
-      setData(newData);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const getNotificationsCount = async () =>{
-    try {
-      const response = await fetch("http://192.168.178.152:3000/api/v1/friendships/requests/count", {
-        method: "get",
-        headers: {
-          "Authorization": authToken,
-        }
-      })
-      const json = await response.json();
-
-      setNotificationCount(json);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   const fillExpanedSections = () =>{
     const next = [...expandedSections]
     const newDate = new Date();
@@ -116,35 +42,6 @@ export default function TodoList({navigation}) {
 
   const handleAddButtonPress = () =>{
     setCreating(!isCreating);
-  }
-
-  const handleLogOut = async () =>{
-    setAuthToken(null);
-    try {
-      const response = await fetch("http://192.168.178.152:3000/todo_users/sign_out", {
-        method: "delete",
-        headers: {
-          "Authorization": authToken,
-        }
-      })
-
-      let toast = Toast.show('Logged Out.', {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.TOP  + 80
-      });
-
-      deleteToken();
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async function deleteToken() {
-    try {
-      await SecureStore.deleteItemAsync('authToken');
-    } catch (error) {
-      console.log(error);
-    }
   }
 
   const handleFriendsNavigation = () =>{
@@ -199,23 +96,29 @@ export default function TodoList({navigation}) {
 
   useEffect(() =>{
     if(isFocused){
-      getTodos();
-      getNotificationsCount();
+      getTodos(authToken, setData, setLoading);
+      getNotificationsCount(authToken, setNotificationCount);
     }
   }, [isFocused])
 
   useEffect(() => {
-    getTodos();
-    getNotificationsCount();
+    getTodos(authToken, setData, setLoading);
+    getNotificationsCount(authToken, setNotificationCount);
     fillExpanedSections();
     handleScrollToItem();
     SplashScreen.hideAsync();
   }, []);
 
+  useEffect(() =>{
+    if(!isCreating){
+      getTodos(authToken, setData, setLoading);
+    }
+  }, [isCreating])
+
   return (
       <GestureHandlerRootView style={styles.container}>
       <View style={styles.topBar}>
-        <Pressable style={styles.logOutButton} onPress={handleLogOut}>
+        <Pressable style={styles.logOutButton} onPress={()=>handleLogOut(setAuthToken, authToken)}>
           <Feather name="log-out" size={24} color="white" />
         </Pressable>
         <Pressable onPress={handleFriendsNavigation}>
@@ -233,7 +136,11 @@ export default function TodoList({navigation}) {
           <Feather name="mail" size={24} color="white" />
         </Pressable>
       </View>
-      <CreateModal isCreating={isCreating} setCreating={setCreating} getTodos={getTodos}/>
+      <CreateModal isCreating={isCreating} setCreating={setCreating} getTodos={()=>getTodos(authToken, 
+                                                                                   setData, 
+                                                                                   setLoading)
+                                                                              }
+      />
       <ParticipantsModal
         isShowingParticipants={isShowingParticipants} 
         setIsShowingParticipants={setIsShowingParticipants}
@@ -246,7 +153,7 @@ export default function TodoList({navigation}) {
           ref={sectionListRef}
           initialNumToRender={12}
           refreshing={false}
-          onRefresh={getTodos}
+          onRefresh={()=>getTodos(authToken, setData, setLoading)}
           style={styles.list}
           stickySectionHeadersEnabled={true}
           sections={data}
@@ -261,11 +168,13 @@ export default function TodoList({navigation}) {
                                           finished={item.finished}
                                           deadline={item.deadline} 
                                           description={item.description}
-                                          getTodos={getTodos}
+                                          getTodos={()=>getTodos(authToken, setData, setLoading)}
                                           removeItem={removeItem}
                                           isShowingParticipants={isShowingParticipants} 
                                           setIsShowingParticipants={setIsShowingParticipants}
                                           setParticipantsTodoID={setParticipantsTodoID}
+                                          setData={setData}
+                                          setLoading={setLoading}
                                           />}
           } 
           renderSectionHeader={({section}) => 

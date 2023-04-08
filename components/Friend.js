@@ -5,6 +5,7 @@ import { Swipeable } from 'react-native-gesture-handler';
 import {Context} from '../App'
 import { Feather } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
+import { handleDeleteFriendship } from '../api';
 
 export default function Friend({email, removeItem, friendId, addable, participantsId, setParticipantsId}) {
   const {
@@ -13,37 +14,6 @@ export default function Friend({email, removeItem, friendId, addable, participan
   } = useContext(Context)
 
   const [isAddable, setIsAddable] = useState(addable);
-
-  const handleDelete = async () => {
-    const friendIdData = {
-      friendship:{
-        friend_id: friendId,
-      }
-    }
-
-    try{
-      removeItem(friendId);
-      const response = await fetch(`http://192.168.178.152:3000/api/v1/friendships`, {
-        method: "delete",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken
-        },
-        body: JSON.stringify(friendIdData)
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-      const data = await response.json();
-      
-    }
-    catch(error){
-      console.error(error);
-    }
-  };
 
   const handleAddToParticipants = () =>{
     let newParticipantsId = [...participantsId];
@@ -100,7 +70,7 @@ export default function Friend({email, removeItem, friendId, addable, participan
         <Swipeable overshootLeft={false}
                   overshootFriction={1}
                   renderRightActions={renderRightActions} 
-                  onSwipeableOpen={handleDelete}
+                  onSwipeableOpen={()=>handleDeleteFriendship(friendId, removeItem, authToken)}
         >
           <View style={styles.friendWrapper}>
             <Text style={styles.text}>{email}</Text>

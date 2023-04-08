@@ -7,6 +7,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
 import Toast from 'react-native-root-toast';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import { getFriends, postFriendships } from '../api';
 
 export default function Friends({navigation}) {
   const [isLoading, setLoading] = useState(true);
@@ -17,55 +18,6 @@ export default function Friends({navigation}) {
     authToken,
     setAuthToken
   } = useContext(Context)
-
-  const getFriends = async () =>{
-    try{
-      const response = await fetch ("http://192.168.178.152:3000/api/v1/friendships", {
-        method: "get",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": authToken,
-        }
-      })
-      const json = await response.json();
-      console.log(json);
-
-      setFriends(json)
-    } catch (error) {
-      console.error(error);
-    } finally{
-      setLoading(false);
-    }
-  }
-
-  const postFriendships = async () =>{
-    const friendshipData = {
-      friendship:{
-        friend_email: email,
-      }
-    }
-
-    try{
-      const response = await fetch ("http://192.168.178.152:3000/api/v1/friendships", {
-        method: "post",
-        headers: {
-          "Authorization": authToken,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(friendshipData),
-      })
-      
-      let toast = Toast.show('Send friend request if user exists.', {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.TOP  + 80
-      });
-
-    }catch(error){
-      console.error(error);
-    } finally{
-      setEmail('')
-    }
-  }
 
   const handleGoBack = () =>{
     navigation.goBack();
@@ -81,7 +33,7 @@ export default function Friends({navigation}) {
   }
 
   useEffect(() => {
-    getFriends();
+    getFriends(authToken, setFriends, setLoading);
   }, []);
 
   return (
@@ -110,7 +62,11 @@ export default function Friends({navigation}) {
               value={email}
               inputMode={'email'}
             />
-            <Pressable style={styles.addFriendButton} onPress={postFriendships}>
+            <Pressable style={styles.addFriendButton} onPress={()=>postFriendships(email,
+                                                                                   authToken, 
+                                                                                   setEmail)
+                                                              }
+            >
               <Text style={styles.addFriendButtonText}>Add Friend</Text>
             </Pressable>
           </View>

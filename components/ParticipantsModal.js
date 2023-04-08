@@ -7,6 +7,7 @@ import {Context} from '../App'
 import { FlatList } from 'react-native-gesture-handler';
 import Friend from './Friend';
 import Modal from 'react-native-modal';
+import { getParticipants } from '../api';
 
 const ParticipantsModal = ({isShowingParticipants, setIsShowingParticipants, participantsTodoID}) => {
   const {
@@ -17,48 +18,6 @@ const ParticipantsModal = ({isShowingParticipants, setIsShowingParticipants, par
   const [isLoading, setLoading] = useState(true);
   const [participants, setParticipants] = useState([]);
   const [creator, setCreator] = useState(null);
-
-  const getCreator = async () =>{
-    try{
-      const response = 
-        await fetch (`http://192.168.178.152:3000/api/v1/todo_tasks/${participantsTodoID}/creator`, {
-          method: "get",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": authToken,
-          }
-        })
-      const json = await response.json();
-      console.log(json);
-
-      setCreator(json)
-    } catch (error) {
-      console.error(error);
-    } finally{
-      setLoading(false);
-    }
-  }
-
-  const getParticipants = async () =>{
-    try{
-      const response = 
-        await fetch (`http://192.168.178.152:3000/api/v1/todo_tasks/${participantsTodoID}/participants`, {
-          method: "get",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": authToken,
-          }
-        })
-      const json = await response.json();
-      console.log(json);
-
-      setParticipants(json)
-    } catch (error) {
-      console.error(error);
-    } finally{
-      getCreator();
-    }
-  }
 
   const combineParticipantsCreator = () =>{
     console.log(participants)
@@ -78,7 +37,7 @@ const ParticipantsModal = ({isShowingParticipants, setIsShowingParticipants, par
 
   useEffect(() => {
     if(isShowingParticipants){
-      getParticipants();
+      getParticipants(authToken, setParticipants, setCreator, setLoading, participantsTodoID);
     }
   }, [isShowingParticipants]);
 

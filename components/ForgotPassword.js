@@ -4,6 +4,7 @@ import {View, Text, Pressable, StyleSheet, TextInput, TouchableOpacity, Keyboard
 import { Feather } from '@expo/vector-icons'; 
 import { useFonts } from 'expo-font';
 import Toast from 'react-native-root-toast';
+import { postResetPassword } from '../api';
 
 export default function ForgotPassword({navigation}) {
   const [fontsLoaded] = useFonts({
@@ -11,37 +12,6 @@ export default function ForgotPassword({navigation}) {
   });
   
   const [email, setEmail] = useState('');
-
-  const postResetPassword = async () =>{
-    const resetData = {
-      email: email
-    }
-
-    setEmail('');
-
-    let toast = Toast.show('Instructions sent, if email exists.', {
-      duration: Toast.durations.SHORT,
-      position: Toast.positions.TOP  + 80
-    });
-
-    try{
-      const response = await fetch("http://192.168.178.152:3000/todo_users/password", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(resetData),
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-    } catch(error){
-      console.error(error);
-    }
-  }
 
   return (
     <TouchableOpacity
@@ -65,7 +35,7 @@ export default function ForgotPassword({navigation}) {
               inputMode={'email'}
               />
           </View>
-          <Pressable style={styles.submitButton} onPress={postResetPassword}>
+          <Pressable style={styles.submitButton} onPress={()=>postResetPassword(email, setEmail)}>
             <Text style={styles.logInButtonText}>Submit</Text>
           </Pressable>
         </View>

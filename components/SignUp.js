@@ -6,6 +6,7 @@ import { Feather } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 import * as SecureStore from 'expo-secure-store';
 import { ScrollView } from 'react-native-gesture-handler';
+import { postUser } from '../api';
 
 export default function SignUp({navigation}) {
   const [fontsLoaded] = useFonts({
@@ -106,86 +107,6 @@ export default function SignUp({navigation}) {
     }
     else{
       setIsPostable(false);
-    }
-  }
-
-  const postUser = async () =>{
-    if(!isValidPassword){
-      console.error("Passwords invalid!");
-      return
-    }
-    if(password !== confirmPassword){
-      console.error("Passwords do not match");
-      return
-    }
-    const logInData = {
-      todo_user:{
-        email: email,
-        password: password,
-      }
-    }
-
-    try{
-      const response = await fetch("http://192.168.178.152:3000/todo_users", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(logInData),
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-      const data = await response;
-
-      postLogIn();
-    } catch(error){
-      console.error(error);
-    }
-  }
-
-  const postLogIn = async () =>{
-    const logInData = {
-      todo_user:{
-        email: email,
-        password: password,
-      }
-    }
-
-    try{
-      const response = await fetch("http://192.168.178.152:3000/todo_users/sign_in", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(logInData),
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-      const data = await response;
-      const newAuthToken = data.headers.get('Authorization');
-
-      console.log(newAuthToken);
-
-      saveAuthToken(newAuthToken);
-      setAuthToken(newAuthToken);
-    } catch(error){
-      console.error(error);
-    }
-  }
-
-  const saveAuthToken = async (newAuthToken) =>{
-    try {
-      await SecureStore.setItemAsync('authToken', newAuthToken);
-    } catch (error) {
-      console.log(error);
     }
   }
 
@@ -337,7 +258,7 @@ export default function SignUp({navigation}) {
           </View>
           <Pressable 
             style={[styles.logInButton, !isPostable ? styles.disabledButton : styles.logInButton]} 
-            onPress={postUser} 
+            onPress={()=>postUser(email, isValidPassword, password, confirmPassword, setAuthToken)} 
             disabled={!isPostable}
           >
             <Text 

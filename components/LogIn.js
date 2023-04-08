@@ -7,6 +7,7 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as SecureStore from 'expo-secure-store';
 import Toast from 'react-native-root-toast';
+import { postLogIn } from '../api';
 
 export default function LogIn({navigation}) {
   const [fontsLoaded] = useFonts({
@@ -25,61 +26,6 @@ export default function LogIn({navigation}) {
   const handleForgotPasswordNavigation =  () => {
     navigation.navigate('ForgotPassword');
   }
-
-  const postLogIn = async () =>{
-    const logInData = {
-      todo_user:{
-        email: email,
-        password: password,
-      }
-    }
-
-    try{
-      const response = await fetch("http://192.168.178.152:3000/todo_users/sign_in", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(logInData),
-      })
-
-      if (!response.ok) {
-        const message = `An error has occured: ${response.status} - ${response.statusText}`;
-        throw new Error(message);
-      }
-
-      const data = await response;
-      const newAuthToken = data.headers.get('Authorization');
-
-      console.log(newAuthToken);
-
-      saveAuthToken(newAuthToken);
-      setAuthToken(newAuthToken);
-
-      let toast = Toast.show('Logged In.', {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.TOP  + 80
-      });
-    } catch(error){
-      console.error(error);
-      let toast = Toast.show('Login Failed.', {
-        duration: Toast.durations.SHORT,
-        position: Toast.positions.TOP  + 80
-      });
-    }
-  }
-
-  const saveAuthToken = async (newAuthToken) =>{
-    try {
-      await SecureStore.setItemAsync('authToken', newAuthToken);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  // useEffect(() => {
-  //   saveAuthToken();
-  // }, [authToken]);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
@@ -142,7 +88,7 @@ export default function LogIn({navigation}) {
               onChangeText={setPassword}
               value={password} />
           </View>
-          <Pressable style={styles.logInButton} onPress={postLogIn}>
+          <Pressable style={styles.logInButton} onPress={() => postLogIn(email, password, setAuthToken)}>
             <Text style={styles.logInButtonText}>Login</Text>
           </Pressable>
           <Pressable style={styles.signUpButton} onPress={() => navigation.navigate('SignUp')}>
