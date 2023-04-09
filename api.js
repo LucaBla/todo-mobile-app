@@ -1,7 +1,38 @@
 import Toast from 'react-native-root-toast';
 import * as SecureStore from 'expo-secure-store';
 
-const API_URL = 'http://192.168.178.152:3000';
+//const API_URL = 'http://192.168.178.152:3000';
+const API_URL = 'https://daily-drill.herokuapp.com'
+
+async function validateToken(authToken, setIsValidAuthToken){
+  if(authToken == null){
+    setIsValidAuthToken(false);
+  }else{
+    try{
+      const response = await fetch(`${API_URL}/member-data`, {
+        method: "get",
+        headers: {
+          "Authorization": authToken,
+        }
+      })
+
+      if (!response.ok) {
+        const message = `An error has occured: ${response.status} - ${response.statusText}`;
+        setIsValidAuthToken(false);
+        throw new Error(message);
+      }
+
+      console.log("Atze")
+      const json = await response.json();
+      
+      setIsValidAuthToken(true);
+
+    } catch(error){
+      console.error(error);
+      setIsValidAuthToken(false);
+    }
+  }
+}
 
 ////////////////////////////////
 //Get
@@ -258,15 +289,8 @@ async function postFriendships(email, authToken, setEmail){
 
 ////////////////////////////////
 
-async function postUser(email, isValidPassword, password, confirmPassword, setAuthToken){
-  if(!isValidPassword){
-    console.error("Passwords invalid!");
-    return
-  }
-  if(password !== confirmPassword){
-    console.error("Passwords do not match");
-    return
-  }
+async function postUser(email, isValidPassword, password, confirmPassword, setAuthToken, setLoading){
+  setLoading(true)
   const logInData = {
     todo_user:{
       email: email,
@@ -275,6 +299,13 @@ async function postUser(email, isValidPassword, password, confirmPassword, setAu
   }
 
   try{
+    if(!isValidPassword){
+      throw new Error("Passwords invalid!");
+    }
+    if(password !== confirmPassword){
+      throw new Error("Passwords do not match");
+    }
+
     const response = await fetch(`${API_URL}/todo_users`, {
       method: "post",
       headers: {
@@ -284,21 +315,23 @@ async function postUser(email, isValidPassword, password, confirmPassword, setAu
     })
 
     if (!response.ok) {
-      const message = `An error has occured: ${response.status} - ${response.statusText}`;
-      throw new Error(message);
+      throw new Error("Couldn't create user.");
     }
 
-    const data = await response;
-
-    postLogIn(email, password, setAuthToken);
+    postLogIn(email, password, setAuthToken, setLoading);
   } catch(error){
-    console.error(error);
+    let toast = Toast.show(error.message, {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.TOP  + 80
+    });
   }
+  setLoading(false)
 }
 
 ////////////////////////////////
 
-async function postLogIn(email, password, setAuthToken){
+async function postLogIn(email, password, setAuthToken, setLoading){
+  setLoading(true);
   const logInData = {
     todo_user:{
       email: email,
@@ -315,25 +348,31 @@ async function postLogIn(email, password, setAuthToken){
       body: JSON.stringify(logInData),
     })
     
-    const data = await response;
+    const data = response;
     const newAuthToken = data.headers.get('Authorization');
 
-    console.log(newAuthToken);
+    console.log(newAuthToken)
 
-    saveAuthToken(newAuthToken);
-    setAuthToken(newAuthToken);
+    if(newAuthToken !== null){
+      saveAuthToken(newAuthToken);
+      setAuthToken(newAuthToken);
+  
+      let toast = Toast.show('Logged In.', {
+        duration: Toast.durations.SHORT,
+        position: Toast.positions.TOP  + 80
+      });
+    }
+    else{
+      throw new Error("No AuthToken")
+    }
 
-    let toast = Toast.show('Logged In.', {
-      duration: Toast.durations.SHORT,
-      position: Toast.positions.TOP  + 80
-    });
   }catch(error){
-        console.error(error);
         let toast = Toast.show('Login Failed.', {
           duration: Toast.durations.SHORT,
           position: Toast.positions.TOP  + 80
         });
       }
+  setLoading(false)
 }
 
 ////////////////////////////////
@@ -579,7 +618,8 @@ async function deleteToken() {
   }
 }
 
-export { getTodos,
+export { validateToken,
+         getTodos,
          getNotificationsCount,
          getCreator,
          getParticipants,

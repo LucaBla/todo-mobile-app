@@ -11,6 +11,7 @@ import ForgotPassword from './components/ForgotPassword';
 import * as SecureStore from 'expo-secure-store';
 import * as SplashScreen from 'expo-splash-screen';
 import { RootSiblingParent } from 'react-native-root-siblings';
+import { validateToken } from './api';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -40,42 +41,12 @@ export default function App() {
     }
   }
 
-  const validateToken = async () =>{
-    if(authToken == null){
-      setIsValidAuthToken(false);
-    }else{
-      try{
-        const response = await fetch("http://192.168.178.152:3000/member-data", {
-          method: "get",
-          headers: {
-            "Authorization": authToken,
-          }
-        })
-  
-        if (!response.ok) {
-          const message = `An error has occured: ${response.status} - ${response.statusText}`;
-          setIsValidAuthToken(false);
-          throw new Error(message);
-        }
-  
-        console.log("Atze")
-        const json = await response.json();
-        
-        setIsValidAuthToken(true);
-  
-      } catch(error){
-        console.error(error);
-        setIsValidAuthToken(false);
-      }
-    }
-  }
-
   useEffect(() => {
     getToken();
   }, []);
 
   useEffect(() => {
-    validateToken();
+    validateToken(authToken, setIsValidAuthToken);
   }, [authToken]);
 
   return (

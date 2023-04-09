@@ -12,6 +12,7 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem,
     setAuthToken
   } = useContext(Context)
 
+  const [isFinished, setIsFinished] = useState(finished);
   const [isOpened, setIsOpened] = useState(false);
   const [swipeState, setSwipeState] = useState(null);
 
@@ -28,8 +29,9 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem,
       handleDeleteTodo(removeItem, id, authToken);
     }
     else if(direction === "left"){
-      handleUpdateTodo(finished, id, authToken, setData, setLoading);
       closeSwipeable();
+      setIsFinished(!isFinished);
+      handleUpdateTodo(isFinished, id, authToken, setData, setLoading);
     }
   }
 
@@ -47,7 +49,7 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem,
   const renderLeftActions = () => {
     return (
       <View style={styles.swipeLeftActionWrapper}>
-        {finished?(
+        {isFinished?(
           <View
               style={[styles.notDoneAction, isOpened ? styles.noMarginBottom : styles.notDoneAction]}>
             <Text
@@ -106,7 +108,7 @@ const Todo = ({id, title, finished, deadline, description, getTodos, removeItem,
           style={[styles.item, isOpened ? styles.noBorderRadius : styles.item]}
         >
           <View style={[styles.todoState, isOpened ? styles.noBorderRadius : styles.todoState]}>
-            {finished?(
+            {isFinished?(
               <Feather name="check" size={24} color="#81A4CD" />
             ):(
               <Feather name="x" size={24} color="red" />

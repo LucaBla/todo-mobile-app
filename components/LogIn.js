@@ -8,6 +8,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as SecureStore from 'expo-secure-store';
 import Toast from 'react-native-root-toast';
 import { postLogIn } from '../api';
+import { ActivityIndicator } from 'react-native';
 
 export default function LogIn({navigation}) {
   const [fontsLoaded] = useFonts({
@@ -17,6 +18,7 @@ export default function LogIn({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isScrollable, setIsScrollable] = useState(false);
+  const [isLoading, setLoading] = useState(false);
 
   const {
     authToken,
@@ -88,8 +90,12 @@ export default function LogIn({navigation}) {
               onChangeText={setPassword}
               value={password} />
           </View>
-          <Pressable style={styles.logInButton} onPress={() => postLogIn(email, password, setAuthToken)}>
-            <Text style={styles.logInButtonText}>Login</Text>
+          <Pressable style={styles.logInButton} onPress={() => postLogIn(email, password, setAuthToken, setLoading)}>
+            {!isLoading? (
+              <Text style={styles.logInButtonText}>Login</Text>
+            ): (
+              <ActivityIndicator size='small' color='#ffffff' style={styles.activityIndicator}/>
+            )}
           </Pressable>
           <Pressable style={styles.signUpButton} onPress={() => navigation.navigate('SignUp')}>
             <Text style={styles.logInButtonText}>Signup</Text>
@@ -164,6 +170,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
     marginTop: 10,
+  },
+  activityIndicator:{
+    padding: 2,
   },
   logInButtonText:{
     color: 'white',

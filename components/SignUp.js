@@ -7,6 +7,7 @@ import { useFonts } from 'expo-font';
 import * as SecureStore from 'expo-secure-store';
 import { ScrollView } from 'react-native-gesture-handler';
 import { postUser } from '../api';
+import { ActivityIndicator } from 'react-native';
 
 export default function SignUp({navigation}) {
   const [fontsLoaded] = useFonts({
@@ -24,6 +25,8 @@ export default function SignUp({navigation}) {
   const [passwordContainsLowercase, setPasswordContainsLowercase] = useState(false);
   const [passwordContainsUppercase, setPasswordContainsUppercase] = useState(false);
   const [passwordContainsSpecialChar, setPasswordContainsSpecialChar] = useState(false);
+
+  const [isLoading, setLoading] = useState(false);
   const [isPostable, setIsPostable] = useState(false);
   const [isScrollable, setIsScrollable] = useState(false);
 
@@ -258,15 +261,21 @@ export default function SignUp({navigation}) {
           </View>
           <Pressable 
             style={[styles.logInButton, !isPostable ? styles.disabledButton : styles.logInButton]} 
-            onPress={()=>postUser(email, isValidPassword, password, confirmPassword, setAuthToken)} 
+            onPress={()=>postUser(email, isValidPassword, password, confirmPassword, setAuthToken, setLoading)} 
             disabled={!isPostable}
           >
-            <Text 
-              style={[styles.logInButtonText,
-                     !isPostable ? styles.disabledButtonText : styles.logInButtonText]}
-            >
-              Signup
-            </Text>
+            {!isLoading ? (
+              <Text 
+                style={[styles.logInButtonText,
+                      !isPostable ? styles.disabledButtonText : styles.logInButtonText]}
+              >
+                Signup
+              </Text>
+            ): (
+              <ActivityIndicator size='small' color='#ffffff' style={styles.activityIndicator}/>
+            )
+
+            }
           </Pressable>
         </View>
         <Pressable 
@@ -401,5 +410,8 @@ const styles = StyleSheet.create({
   invisibleBorder:{
     borderWidth: 2,
     borderColor: '#1B1E23',
+  },
+  activityIndicator:{
+    padding: 2,
   },
 })
