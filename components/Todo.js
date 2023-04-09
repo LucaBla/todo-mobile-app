@@ -170,6 +170,7 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "stretch",
     borderBottomLeftRadius: 10,
     borderTopLeftRadius: 10
   },
